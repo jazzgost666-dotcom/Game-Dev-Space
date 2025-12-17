@@ -11,121 +11,39 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background:#0f0f14; color:#fff; }
+    * { box-sizing:border-box; font-family:Arial,sans-serif }
+    body { margin:0; background:#0f0f14; color:#fff }
 
-    header {
-      padding:20px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background:#151522;
-      position:relative;
-    }
+    header { padding:20px; background:#151522; text-align:center; position:relative }
+    header h1 { margin:0; font-size:28px }
+    header .actions { position:absolute; right:20px; top:20px; display:flex; gap:10px }
+    button { background:#4f46e5; color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:bold; cursor:pointer }
 
-    header h1 { margin:0; font-size:28px; }
+    main { max-width:1200px; margin:auto; padding:20px }
 
-    header .actions {
-      position:absolute;
-      right:20px;
-      display:flex;
-      gap:10px;
-    }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px }
+    .card { background:#151522; border-radius:16px; overflow:hidden; cursor:pointer; transition:.2s }
+    .card:hover { transform:scale(1.03) }
+    .card img { width:100%; height:140px; object-fit:cover }
+    .info { padding:14px }
+    .info h3 { margin:0 0 6px }
+    .info small { opacity:.6 }
 
-    header button {
-      background:#4f46e5;
-      color:#fff;
-      border:none;
-      padding:8px 14px;
-      border-radius:10px;
-      font-weight:bold;
-      cursor:pointer;
-    }
+    .modal { position:fixed; inset:0; background:rgba(0,0,0,.8); display:none; justify-content:center; align-items:center; z-index:10 }
+    .box { background:#151522; padding:20px; border-radius:16px; width:100%; max-width:420px; display:grid; gap:10px }
+    .box input, .box textarea { padding:10px; border-radius:8px; border:none; background:#0f0f14; color:#fff }
+    textarea { resize:none; height:100px }
 
-    main { max-width:1200px; margin:auto; padding:20px; }
+    .game-page { max-width:900px; margin:auto }
+    .game-page img { width:100%; border-radius:16px }
+    .game-page h2 { margin:16px 0 8px }
+    .game-page p { opacity:.8 }
 
-    .form {
-      background:#151522;
-      padding:20px;
-      border-radius:14px;
-      margin-bottom:30px;
-      display:none;
-      gap:12px;
-    }
+    .actions-row { display:flex; gap:10px; margin:14px 0 }
+    .like { background:#ef4444 }
+    .highlight { background:#22c55e; color:#000 }
 
-    .form input, .form button {
-      padding:10px;
-      border-radius:8px;
-      border:none;
-      outline:none;
-      width:100%;
-    }
-
-    .form input { background:#0f0f14; color:#fff; }
-
-    .form button {
-      background:#22c55e;
-      color:#000;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:20px;
-    }
-
-    .card {
-      background:#151522;
-      border-radius:16px;
-      overflow:hidden;
-      transition:.2s;
-      position:relative;
-    }
-
-    .card:hover { transform:scale(1.04); }
-
-    .card img {
-      width:100%;
-      height:140px;
-      object-fit:cover;
-      background:#000;
-    }
-
-    .info { padding:14px; }
-    .info h3 { margin:0 0 8px; font-size:18px; }
-    .info a {
-      color:#4f46e5;
-      text-decoration:none;
-      font-size:14px;
-      font-weight:bold;
-    }
-
-    .owner-actions {
-      position:absolute;
-      top:8px;
-      right:8px;
-      display:flex;
-      gap:6px;
-    }
-
-    .owner-actions button {
-      font-size:12px;
-      padding:4px 6px;
-      border-radius:6px;
-      border:none;
-      cursor:pointer;
-    }
-
-    .edit { background:#facc15; }
-    .delete { background:#ef4444; color:#fff; }
-
-    footer {
-      text-align:center;
-      padding:20px;
-      opacity:.4;
-    }
+    footer { text-align:center; padding:20px; opacity:.4 }
   </style>
 </head>
 <body>
@@ -134,27 +52,55 @@
   <h1>Game Dev Space</h1>
   <div class="actions">
     <button id="loginBtn">Login</button>
-    <button id="logoutBtn" style="display:none">Sair</button>
     <button id="postBtn" style="display:none">Postar</button>
+    <button id="logoutBtn" style="display:none">Sair</button>
   </div>
 </header>
 
-<main>
+<main id="home">
+  <h2>Destaques</h2>
+  <div class="grid" id="featured"></div>
 
-  <div class="form" id="form">
-    <input id="name" placeholder="Nome do jogo" />
-    <input id="url" placeholder="Link do jogo (HTML)" />
-    <input id="img" placeholder="Link da thumbnail" />
-    <button id="publishBtn">Publicar</button>
-  </div>
-
+  <h2 style="margin-top:40px">Todos os jogos</h2>
   <div class="grid" id="games"></div>
-
 </main>
 
-<footer>
-  Game Dev Space • Biblioteca aberta para jogos HTML
-</footer>
+<main id="gameView" style="display:none"></main>
+
+<footer>Game Dev Space • Biblioteca de jogos HTML</footer>
+
+<!-- MODALS -->
+<div class="modal" id="authModal">
+  <div class="box">
+    <h2>Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Senha">
+    <button id="emailLogin">Entrar</button>
+    <button id="googleLogin" style="background:#4285F4">Entrar com Google</button>
+    <button onclick="showRegister()">Criar conta</button>
+  </div>
+</div>
+
+<div class="modal" id="registerModal">
+  <div class="box">
+    <h2>Registro</h2>
+    <input id="nick" placeholder="Nickname">
+    <input id="regEmail" placeholder="Email">
+    <input id="regPass" type="password" placeholder="Senha">
+    <button id="register">Registrar</button>
+  </div>
+</div>
+
+<div class="modal" id="postModal">
+  <div class="box">
+    <h2>Novo jogo</h2>
+    <input id="gName" placeholder="Nome do jogo">
+    <textarea id="gDesc" placeholder="Descrição"></textarea>
+    <input id="gImg" placeholder="Imagem">
+    <input id="gUrl" placeholder="Link do jogo">
+    <button id="publish">Publicar</button>
+  </div>
+</div>
 
 <script>
   const firebaseConfig = {
@@ -168,107 +114,89 @@
   };
 
   firebase.initializeApp(firebaseConfig);
-
   const auth = firebase.auth();
-  const database = firebase.database();
-  const gamesRef = database.ref('games');
+  const db = firebase.database();
+  const gamesRef = db.ref('games');
+  const usersRef = db.ref('users');
 
-  const grid = document.getElementById('games');
-  const form = document.getElementById('form');
-  const postBtn = document.getElementById('postBtn');
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const publishBtn = document.getElementById('publishBtn');
+  let currentUser=null, currentNick='';
 
-  let currentUser = null;
+  const home=document.getElementById('home');
+  const gameView=document.getElementById('gameView');
 
-  function toggleForm() {
-    form.style.display = form.style.display === 'grid' ? 'none' : 'grid';
-  }
+  loginBtn.onclick=()=>authModal.style.display='flex';
+  logoutBtn.onclick=()=>auth.signOut();
+  postBtn.onclick=()=>postModal.style.display='flex';
 
-  loginBtn.onclick = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+  emailLogin.onclick=()=>auth.signInWithEmailAndPassword(email.value,pass.value).then(()=>authModal.style.display='none').catch(e=>alert(e.message));
+
+  googleLogin.onclick=()=>auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(()=>authModal.style.display='none');
+
+  register.onclick=()=>{
+    auth.createUserWithEmailAndPassword(regEmail.value,regPass.value).then(cred=>{
+      usersRef.child(cred.user.uid).set({nickname:nick.value});
+      registerModal.style.display='none';
+    }).catch(e=>alert(e.message));
   };
 
-  logoutBtn.onclick = () => auth.signOut();
+  function showRegister(){ authModal.style.display='none'; registerModal.style.display='flex' }
 
-  auth.onAuthStateChanged(user => {
-    currentUser = user;
-    if (user) {
-      loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'inline-block';
-      postBtn.style.display = 'inline-block';
+  auth.onAuthStateChanged(u=>{
+    currentUser=u;
+    if(u){
+      loginBtn.style.display='none'; logoutBtn.style.display='inline-block'; postBtn.style.display='inline-block';
+      usersRef.child(u.uid).once('value',s=>currentNick=s.val()?.nickname||u.displayName||'Dev');
     } else {
-      loginBtn.style.display = 'inline-block';
-      logoutBtn.style.display = 'none';
-      postBtn.style.display = 'none';
-      form.style.display = 'none';
+      loginBtn.style.display='inline-block'; logoutBtn.style.display='none'; postBtn.style.display='none';
     }
-    renderGames();
   });
 
-  postBtn.onclick = toggleForm;
-
-  publishBtn.onclick = () => {
-    const name = document.getElementById('name').value.trim();
-    const url = document.getElementById('url').value.trim();
-    const img = document.getElementById('img').value.trim();
-
-    if (!name || !url) return alert('Preencha nome e link');
-
+  publish.onclick=()=>{
     gamesRef.push({
-      name,
-      url,
-      img,
-      owner: currentUser.uid,
-      ownerName: currentUser.displayName,
-      createdAt: Date.now()
+      name:gName.value,
+      desc:gDesc.value,
+      img:gImg.value,
+      url:gUrl.value,
+      owner:currentUser.uid,
+      ownerNick:currentNick,
+      likes:0,
+      featured:false,
+      created:Date.now()
     });
-
-    form.style.display = 'none';
-    document.getElementById('name').value = '';
-    document.getElementById('url').value = '';
-    document.getElementById('img').value = '';
+    postModal.style.display='none';
   };
 
-  function renderGames() {
-    gamesRef.on('value', snap => {
-      grid.innerHTML = '';
-      const data = snap.val();
-      if (!data) return;
-
-      Object.entries(data)
-        .sort((a,b) => b[1].createdAt - a[1].createdAt)
-        .forEach(([id, g]) => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          let ownerButtons = '';
-          if (currentUser && g.owner === currentUser.uid) {
-            ownerButtons = `
-              <div class="owner-actions">
-                <button class="delete" onclick="deleteGame('${id}')">X</button>
-              </div>`;
-          }
-
-          card.innerHTML = `
-            ${ownerButtons}
-            <img src="${g.img || 'https://via.placeholder.com/400x200'}">
-            <div class="info">
-              <h3>${g.name}</h3>
-              <a href="${g.url}" target="_blank">Jogar</a>
-            </div>`;
-
-          grid.appendChild(card);
-        });
+  gamesRef.on('value',snap=>{
+    games.innerHTML=''; featured.innerHTML='';
+    const data=snap.val(); if(!data) return;
+    Object.entries(data).sort((a,b)=>b[1].created-a[1].created).forEach(([id,g])=>{
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`<img src="${g.img}"><div class='info'><h3>${g.name}</h3><small>${g.ownerNick}</small></div>`;
+      card.onclick=()=>openGame(id,g);
+      games.appendChild(card);
+      if(g.featured) featured.appendChild(card.cloneNode(true));
     });
+  });
+
+  function openGame(id,g){
+    home.style.display='none'; gameView.style.display='block';
+    gameView.innerHTML=`
+      <div class='game-page'>
+        <button onclick='back()'>← Voltar</button>
+        <img src='${g.img}'>
+        <h2>${g.name}</h2>
+        <p>${g.desc}</p>
+        <div class='actions-row'>
+          <button onclick="window.open('${g.url}')">Jogar</button>
+          <button class='like' onclick='like("${id}")'>❤ ${g.likes||0}</button>
+          ${currentUser&&g.owner===currentUser.uid?`<button class='highlight' onclick='feature("${id}")'>Destaque</button>`:''}
+        </div>
+      </div>`;
   }
 
-  window.deleteGame = id => {
-    if (!confirm('Deletar este jogo?')) return;
-    gamesRef.child(id).remove();
-  };
+  function back(){ gameView.style.display='none'; home.style.display='block' }
+  function like(id){ gamesRef.child(id).child('likes').transaction(v=>(v||0)+1) }
+  function feature(id){ gamesRef.child(id).update({featured:true}) }
 </script>
 
 </body>
