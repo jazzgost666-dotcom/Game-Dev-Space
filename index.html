@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <title>Game Dev Space</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body { margin: 0; background:#0f0f14; color:#fff; }
@@ -11,14 +16,17 @@
     header {
       padding:20px;
       display:flex;
-      justify-content:space-between;
+      justify-content:center;
       align-items:center;
       background:#151522;
+      position:relative;
     }
 
-    header h1 { margin:0; font-size:26px; }
+    header h1 { margin:0; font-size:28px; }
 
     header button {
+      position:absolute;
+      right:20px;
       background:#4f46e5;
       color:#fff;
       border:none;
@@ -97,7 +105,7 @@
 <body>
 
 <header>
-  <h1>🎮 Game Dev Space</h1>
+  <h1>Game Dev Space</h1>
   <button id="postBtn">Postar jogo</button>
 </header>
 
@@ -119,46 +127,25 @@
 </footer>
 
 <script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAMHAKVot044psR421B_t-Ht5EmsueVS8A",
+    authDomain: "game-dev-space.firebaseapp.com",
+    databaseURL: "https://game-dev-space-default-rtdb.firebaseio.com",
+    projectId: "game-dev-space",
+    storageBucket: "game-dev-space.firebasestorage.app",
+    messagingSenderId: "1073185335190",
+    appId: "1:1073185335190:web:ae9ffd88cdf89f53cbdfb7"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const gamesRef = database.ref('games');
+
   const grid = document.getElementById('games');
   const form = document.getElementById('form');
   const postBtn = document.getElementById('postBtn');
   const publishBtn = document.getElementById('publishBtn');
-
-  const defaultGames = [
-    {
-      name: 'Exemplo Game',
-      url: 'https://exemplo.github.io/game',
-      img: 'https://via.placeholder.com/400x200'
-    }
-  ];
-
-  let games = [];
-
-  try {
-    games = JSON.parse(localStorage.getItem('games')) || defaultGames;
-  } catch (e) {
-    games = defaultGames;
-  }
-
-  function save() {
-    localStorage.setItem('games', JSON.stringify(games));
-  }
-
-  function render() {
-    grid.innerHTML = '';
-    games.forEach(g => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${g.img}" onerror="this.src='https://via.placeholder.com/400x200'" />
-        <div class="info">
-          <h3>${g.name}</h3>
-          <a href="${g.url}" target="_blank">Jogar</a>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
 
   function toggleForm() {
     form.style.display = form.style.display === 'grid' ? 'none' : 'grid';
@@ -174,9 +161,12 @@
       return;
     }
 
-    games.unshift({ name, url, img });
-    save();
-    render();
+    gamesRef.push({
+      name,
+      url,
+      img,
+      createdAt: Date.now()
+    });
 
     form.style.display = 'none';
     document.getElementById('name').value = '';
@@ -187,7 +177,26 @@
   postBtn.addEventListener('click', toggleForm);
   publishBtn.addEventListener('click', addGame);
 
-  render();
+  gamesRef.on('value', snapshot => {
+    const data = snapshot.val();
+    grid.innerHTML = '';
+    if (!data) return;
+
+    Object.values(data)
+      .sort((a,b) => b.createdAt - a.createdAt)
+      .forEach(g => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${g.img || 'https://via.placeholder.com/400x200'}">
+          <div class="info">
+            <h3>${g.name}</h3>
+            <a href="${g.url}" target="_blank">Jogar</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+  });
 </script>
 
 </body>
