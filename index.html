@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Game Dev Space V2.0</title>
+<title>Game Dev Space V3.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;800&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
@@ -12,70 +12,50 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.5); --bg: #050510; }
+:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.6); --bg: #050510; }
 *{box-sizing:border-box; font-family: 'Inter', sans-serif;}
-
 body { margin:0; color:#fff; background: var(--bg); overflow-x: hidden; }
 
 /* Fundo Animado Tech */
-.bg-tech {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at center, #1b1f3b 0%, #050510 100%);
-    z-index: -1;
-}
-.bg-tech::after {
-    content: ""; position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px), 
-                      linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: move-bg 15s linear infinite;
-}
+.bg-tech { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1b1f3b 0%, #050510 100%); z-index: -1; }
+.bg-tech::after { content: ""; position: absolute; inset: 0; background-size: 50px 50px; background-image: linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px); animation: move-bg 12s linear infinite; }
 @keyframes move-bg { from { transform: translateY(0); } to { transform: translateY(50px); } }
 
-header { padding: 50px 20px; text-align: center; }
-header h1 {
-    font-family: 'Orbitron', sans-serif; font-size: clamp(32px, 8vw, 55px); margin: 0;
-    color: var(--neon); text-shadow: 0 0 20px var(--glow); letter-spacing: 5px;
-    text-align: center; width: 100%;
-}
+header { padding: 40px 20px; text-align: center; }
+header h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(28px, 8vw, 50px); margin: 0; color: var(--neon); text-shadow: 0 0 25px var(--glow); letter-spacing: 4px; }
 
-.search-bar { margin: 25px auto 0; width: 100%; max-width: 550px; }
-.search-bar input {
-    width: 100%; padding: 14px 25px; border-radius: 30px; border: 1px solid rgba(34, 197, 94, 0.4);
-    background: rgba(0,0,0,0.7); color: #fff; font-size: 16px; outline: none; transition: 0.3s;
-}
-.search-bar input:focus { border-color: var(--neon); box-shadow: 0 0 15px var(--glow); }
+/* Barra de Pesquisa Funcional */
+.search-container { margin: 25px auto; width: 100%; max-width: 600px; }
+.search-container input { width: 100%; padding: 15px 30px; border-radius: 50px; border: 2px solid rgba(34, 197, 94, 0.3); background: rgba(0,0,0,0.8); color: #fff; font-size: 16px; outline: none; transition: 0.3s; text-align: center; }
+.search-container input:focus { border-color: var(--neon); box-shadow: 0 0 20px var(--glow); }
 
 .top-nav { position: absolute; right: 20px; top: 20px; display: flex; gap: 10px; }
 
-/* Cards com Glow */
-main { max-width: 1300px; margin: auto; padding: 20px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
-
-.card {
-    background: #0f1025; border-radius: 18px; overflow: hidden; cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.05); position: relative;
-    transition: 0.3s ease-out;
-}
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 0 30px var(--glow);
-    border-color: var(--neon);
-}
-.card img { width: 100%; height: 165px; object-fit: cover; border-bottom: 1px solid rgba(34, 197, 94, 0.2); }
+/* Grid e Efeito Glow */
+main { max-width: 1200px; margin: auto; padding: 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+.card { background: #0f1025; border-radius: 20px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); position: relative; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.card:hover { transform: translateY(-12px); box-shadow: 0 0 35px var(--glow); border-color: var(--neon); }
+.card img { width: 100%; height: 160px; object-fit: cover; transition: 0.3s; }
 .card-info { padding: 15px; text-align: center; }
+.card-info h3 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--neon); }
+.likes-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 5px 12px; border-radius: 20px; font-size: 12px; color: var(--neon); border: 1px solid var(--neon); }
+
+/* Comentários */
+.comments-section { max-width: 800px; margin: 40px auto; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 20px; text-align: left; }
+.comment-item { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+.comment-item small { color: var(--neon); display: block; margin-bottom: 4px; }
 
 /* Modais */
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-.modal-box { background: #0f1025; padding: 35px; border-radius: 20px; border: 2px solid var(--neon); width: 90%; max-width: 380px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-.modal-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #222; background: #050510; color: #fff; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+.modal-box { background: #0f1025; padding: 30px; border-radius: 25px; border: 2px solid var(--neon); width: 90%; max-width: 360px; text-align: center; }
+.modal-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #222; background: #050510; color: #fff; text-align: center; }
 
-button { background: #4f46e5; color: #fff; border: none; padding: 10px 22px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-button:hover { transform: translateY(-2px); filter: brightness(1.1); }
-.btn-block { width: 100%; margin-top: 12px; padding: 14px; font-size: 16px; }
+button { background: #4f46e5; color: #fff; border: none; padding: 12px 24px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+button:hover { transform: scale(1.05); }
 
-#gameView { display: none; padding: 20px; text-align: center; max-width: 1100px; margin: auto; }
-.iframe-container { width: 100%; height: 75vh; background: #000; border-radius: 20px; border: 2px solid var(--neon); margin: 25px 0; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+#gameView { display: none; padding: 20px; text-align: center; }
+.iframe-container { width: 100%; height: 70vh; max-width: 1000px; margin: 20px auto; border-radius: 20px; border: 2px solid var(--neon); overflow: hidden; }
 iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
@@ -85,28 +65,29 @@ iframe { width: 100%; height: 100%; border: none; }
 
 <header>
     <div class="top-nav">
-        <button id="adminBtn" style="background:#22c55e; box-shadow: 0 0 10px var(--glow);">Admin</button>
-        <button id="loginOpenBtn">Entrar / Registrar</button>
-        <button id="logoutBtn" style="display:none; background:#ef4444">Sair</button>
+        <button id="adminBtn" style="background:var(--neon); color:#000">ADMIN</button>
+        <button id="loginOpenBtn">LOGIN</button>
+        <button id="logoutBtn" style="display:none; background:#ef4444">SAIR</button>
     </div>
     <h1>GAME DEV SPACE</h1>
-    <div class="search-bar">
-        <input type="text" id="searchInp" placeholder="Pesquisar na biblioteca tech...">
+    <div class="search-container">
+        <input type="text" id="searchInp" placeholder="DIGITE O NOME DE UM JOGO PARA FILTRAR...">
     </div>
 </header>
 
 <div id="authModal" class="modal">
     <div class="modal-box">
-        <h2 id="authTitle" style="font-family:Orbitron; text-align:center; color:var(--neon)">LOGIN</h2>
+        <h2 id="authTitle" style="font-family:Orbitron; color:var(--neon)">LOGIN</h2>
         <input type="email" id="emailInp" placeholder="E-mail">
         <input type="password" id="passInp" placeholder="Senha">
-        <button class="btn-block" id="primaryAuthBtn">Entrar</button>
-        <button class="btn-block" style="background:transparent; color:var(--neon); border: 1px solid var(--neon)" id="switchAuthBtn">Criar nova conta</button>
-        <button class="btn-block" style="background:transparent; color:#888" onclick="closeModals()">Cancelar</button>
+        <button style="width:100%" id="primaryAuthBtn">ENTRAR</button>
+        <button style="width:100%; background:transparent; border: 1px solid #333; margin-top: 10px;" id="switchAuthBtn">CRIAR CONTA</button>
+        <button style="width:100%; background:transparent; color:#666; margin-top: 10px;" onclick="closeModals()">FECHAR</button>
     </div>
 </div>
 
 <main id="home">
+    <h2 id="sectionLabel" style="font-family:Orbitron; font-size:18px; color:#888; margin-bottom:20px;">RANKING POR CURTIDAS</h2>
     <div class="grid" id="mainGrid"></div>
 </main>
 
@@ -123,98 +104,129 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-let isRegisterMode = false;
-let isAdmin = false;
+let isAdminActive = false;
 let allGames = [];
-const ADMIN_PASS = "15423993946";
+const MASTER_PASS = "15423993946";
 
+// Auth e Modais
 const closeModals = () => authModal.style.display = "none";
 loginOpenBtn.onclick = () => authModal.style.display = "flex";
 
-switchAuthBtn.onclick = () => {
-    isRegisterMode = !isRegisterMode;
-    authTitle.innerText = isRegisterMode ? "REGISTRO" : "LOGIN";
-    primaryAuthBtn.innerText = isRegisterMode ? "Cadastrar" : "Entrar";
-    switchAuthBtn.innerText = isRegisterMode ? "Voltar para Login" : "Criar nova conta";
-};
-
 primaryAuthBtn.onclick = () => {
-    const email = emailInp.value;
-    const pass = passInp.value;
-    if(isRegisterMode) {
-        auth.createUserWithEmailAndPassword(email, pass).then(closeModals).catch(e => alert("Erro: " + e.message));
-    } else {
-        auth.signInWithEmailAndPassword(email, pass).then(closeModals).catch(e => alert("Erro: " + e.message));
-    }
+    const e = emailInp.value, p = passInp.value;
+    auth.signInWithEmailAndPassword(e, p).then(closeModals).catch(() => auth.createUserWithEmailAndPassword(e, p).then(closeModals));
 };
-
-logoutBtn.onclick = () => { auth.signOut(); isAdmin = false; location.reload(); };
 
 auth.onAuthStateChanged(user => {
     loginOpenBtn.style.display = user ? "none" : "block";
     logoutBtn.style.display = user ? "block" : "none";
 });
+logoutBtn.onclick = () => { auth.signOut(); isAdminActive = false; location.reload(); };
 
+// Admin Postar
 adminBtn.onclick = () => {
-    const p = prompt("Senha Admin:");
-    if(p === ADMIN_PASS) {
-        isAdmin = true;
-        alert("Modo Administrador: ON");
-        if(confirm("Deseja postar um novo jogo agora?")) {
-            const name = prompt("Nome:");
-            const img = prompt("URL da Capa:");
-            const url = prompt("Link do Jogo:");
-            if(name && url) db.ref("games").push({ name, img, url, date: Date.now() });
-        }
-    } else { alert("Acesso negado."); }
+    if(prompt("SENHA ADMIN:") === MASTER_PASS) {
+        isAdminActive = true;
+        const n = prompt("NOME:"), i = prompt("URL IMAGEM:"), u = prompt("URL JOGO:");
+        if(n && u) db.ref("games").push({ name: n, img: i, url: u, likes: 0, date: Date.now() });
+    } else alert("Senha incorreta!");
 };
 
+// Renderização e Destaque (Ranking)
 db.ref("games").on("value", snap => {
-    const data = snap.val() || {};
-    allGames = Object.entries(data).map(([id, g]) => ({ id, ...g }));
+    allGames = Object.entries(snap.val() || {}).map(([id, g]) => ({ id, ...g }));
     render(allGames);
 });
 
 function render(list) {
     mainGrid.innerHTML = "";
-    list.sort((a,b) => b.date - a.date).forEach(g => {
+    // Ordena por mais curtidas primeiro
+    list.sort((a, b) => (b.likes || 0) - (a.likes || 0)).forEach(g => {
         const item = document.createElement("div");
         item.className = "card";
-        item.innerHTML = `<img src="${g.img || ''}"><div class="card-info"><h3>${g.name}</h3></div>`;
+        item.innerHTML = `
+            <div class="likes-badge">❤ ${g.likes || 0}</div>
+            <img src="${g.img || ''}">
+            <div class="card-info"><h3>${g.name.toUpperCase()}</h3></div>
+        `;
         item.onclick = () => openGame(g);
         mainGrid.appendChild(item);
     });
 }
 
+// Barra de Pesquisa Funcional
 searchInp.oninput = (e) => {
-    const term = e.target.value.toLowerCase();
-    render(allGames.filter(g => g.name.toLowerCase().includes(term)));
+    const t = e.target.value.toLowerCase();
+    const filtered = allGames.filter(g => g.name.toLowerCase().includes(t));
+    render(filtered);
+    sectionLabel.innerText = t ? `RESULTADOS PARA: ${t.toUpperCase()}` : "RANKING POR CURTIDAS";
 };
 
+// Página do Jogo com Comentários e Like
 function openGame(g) {
     home.style.display = "none";
     gameView.style.display = "block";
     gameView.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button onclick="back()">← Voltar</button>
-            <h2 style="font-family:Orbitron; color:var(--neon); margin:0">${g.name}</h2>
-            ${isAdmin ? `<button onclick="del('${g.id}')" style="background:#ef4444">DELETAR JOGO</button>` : '<div></div>'}
+        <div style="display:flex; justify-content:space-between; max-width:1000px; margin:auto;">
+            <button onclick="back()">← VOLTAR</button>
+            <h2 style="font-family:Orbitron; color:var(--neon)">${g.name}</h2>
+            ${isAdminActive ? `<button onclick="del('${g.id}')" style="background:#ef4444">DELETAR</button>` : '<div></div>'}
         </div>
         <div class="iframe-container"><iframe src="${g.url}"></iframe></div>
+        <button onclick="like('${g.id}')" style="padding:15px 40px; font-size:18px; background:var(--neon); color:#000">CURTIR ❤ (${g.likes || 0})</button>
+        
+        <div class="comments-section">
+            <h3>💬 Comentários</h3>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="text" id="comInp" placeholder="Escreva algo..." style="flex:1; padding:10px; border-radius:10px; border:none;">
+                <button onclick="postComment('${g.id}')">ENVIAR</button>
+            </div>
+            <div id="commentsList"></div>
+        </div>
     `;
-    window.scrollTo(0,0);
+    loadComments(g.id);
+}
+
+function like(id) {
+    if(!auth.currentUser) return alert("Faça login para curtir!");
+    db.ref("games").child(id).child("likes").transaction(l => (l || 0) + 1);
+    setTimeout(() => { // Gambiarra simples para atualizar o contador na tela sem fechar
+        const g = allGames.find(x => x.id === id);
+        openGame(g);
+    }, 500);
+}
+
+function postComment(gameId) {
+    const text = document.getElementById("comInp").value;
+    if(!text || !auth.currentUser) return alert("Faça login e escreva algo!");
+    db.ref("comments").child(gameId).push({
+        user: auth.currentUser.email,
+        text: text,
+        date: Date.now()
+    });
+    document.getElementById("comInp").value = "";
+}
+
+function loadComments(gameId) {
+    db.ref("comments").child(gameId).on("value", snap => {
+        const list = document.getElementById("commentsList");
+        if(!list) return;
+        list.innerHTML = "";
+        Object.values(snap.val() || {}).reverse().forEach(c => {
+            list.innerHTML += `<div class="comment-item"><small>${c.user}</small>${c.text}</div>`;
+        });
+    });
 }
 
 function del(id) {
-    const p = prompt("Confirme a senha para APAGAR:");
-    if(p === ADMIN_PASS) {
-        db.ref("games").child(id).remove();
+    if(prompt("SENHA PARA APAGAR:") === MASTER_PASS) {
+        db.ref("games").child(id).remove(); // Remove o jogo
+        db.ref("comments").child(id).remove(); // Remove os comentários dele também
         back();
-    } else { alert("Senha incorreta!"); }
+    } else alert("Senha incorreta!");
 }
 
 function back() { gameView.style.display = "none"; home.style.display = "block"; }
-
 </script>
 </body>
 </html>
