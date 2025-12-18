@@ -1,399 +1,281 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevCord - A Rede dos Desenvolvedores</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>GAMEHUB | Cloud</title>
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=gg+sans:wght@400;500;600;700&display=swap');
-        
+        :root {
+            --bg-dark: #070b14;
+            --accent: #8b5cf6;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --text: #f8fafc;
+            --danger: #ef4444;
+            --glow: 0 0 15px rgba(139, 92, 246, 0.6);
+        }
+
         body {
-            font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #313338;
-            color: #dbdee1;
-            overflow: hidden;
+            margin: 0; font-family: 'Inter', sans-serif;
+            background: var(--bg-dark); color: var(--text);
+            min-height: 100vh; overflow-x: hidden;
         }
 
-        .scrollbar-hide::-webkit-scrollbar {
-            width: 4px;
-        }
-        .scrollbar-hide::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .scrollbar-hide::-webkit-scrollbar-thumb {
-            background: #1e1f22;
-            border-radius: 10px;
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px; animation: moveGrid 30s linear infinite;
         }
 
-        .server-icon {
-            transition: border-radius 0.2s ease, background-color 0.2s ease;
-        }
-        .server-icon:hover {
-            border-radius: 16px;
-            background-color: #5865f2;
-            color: white;
-        }
-        .server-icon.active {
-            border-radius: 16px;
-            background-color: #5865f2;
-            color: white;
+        @keyframes moveGrid { from { background-position: 0 0; } to { background-position: 80px 80px; } }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; background: rgba(7, 11, 20, 0.9);
+            backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .channel-item:hover {
-            background-color: #3f4147;
-            color: #f2f3f5;
+        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
+        .search-container input {
+            width: 100%; padding: 12px 20px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+            color: white; outline: none; transition: 0.3s;
         }
-        .channel-item.active {
-            background-color: #3f4147;
-            color: #ffffff;
-        }
+        .search-container input:focus { border-color: var(--accent); box-shadow: var(--glow); }
 
-        .message-hover:hover {
-            background-color: #2e3035;
-        }
+        .nav-right { display: flex; gap: 15px; align-items: center; }
+        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-main:hover { box-shadow: var(--glow); transform: translateY(-2px); }
 
-        .status-online { background-color: #23a559; }
-        .status-dnd { background-color: #f23f43; }
-        .status-idle { background-color: #f0b232; }
+        .user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 5px 12px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #1e293b; }
 
-        .muted { color: #f23f43 !important; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .section-title { font-size: 1rem; font-weight: 900; margin: 40px 0 20px; letter-spacing: 2px; color: rgba(255,255,255,0.5); border-left: 4px solid var(--accent); padding-left: 15px; }
 
-        /* Code Block Styling in Chat */
-        .code-snippet {
-            background-color: #1e1f22;
-            border-radius: 4px;
-            padding: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            margin-top: 4px;
-            border: 1px solid #3f4147;
-        }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .game-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.4s; }
+        .game-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: scale(1.02); }
+        .game-thumb { width: 100%; height: 160px; object-fit: cover; }
+        .game-info { padding: 15px; }
+
+        .game-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 1000; display: none; flex-direction: column; }
+        .game-header { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #0f172a; border-bottom: 1px solid #1e293b; }
+        .game-body { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 30px; }
+        .iframe-wrapper { width: 100%; max-width: 1100px; height: 75vh; background: #000; border-radius: 12px; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .like-btn-container { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
+        .heart-icon { width: 32px; height: 32px; stroke: white; stroke-width: 2px; fill: transparent; transition: 0.3s; }
+        .liked .heart-icon { stroke: var(--danger); fill: var(--danger); filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6)); transform: scale(1.2); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; backdrop-filter: blur(5px); }
+        .modal-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111827; padding: 40px; border-radius: 12px; z-index: 2001; width: 90%; max-width: 420px; display: none; border: 1px solid var(--accent); }
+        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; border: 1px solid #1f2937; background: #030712; color: white; box-sizing: border-box; }
     </style>
 </head>
-<body class="h-screen w-full flex">
+<body>
 
-    <!-- BARRA LATERAL DE SERVIDORES -->
-    <nav class="w-[72px] bg-[#1e1f22] flex flex-col items-center py-3 space-y-2 select-none">
-        <div class="relative group" onclick="switchServer('home', this)">
-            <div id="indicator-home" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-2 bg-white rounded-r-full group-hover:h-5 transition-all duration-200"></div>
-            <div class="server-icon active w-12 h-12 bg-[#313338] rounded-[24px] flex items-center justify-center text-[#dbdee1] cursor-pointer">
-                <i class="fa-solid fa-code text-2xl"></i>
+    <div class="bg-animation"></div>
+
+    <header>
+        <div style="font-weight: 900; color: var(--accent); font-size: 1.6rem; letter-spacing: -1px;">GAMEHUB</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="PESQUISAR..." oninput="searchGames()">
+        </div>
+        <div class="nav-right">
+            <button class="btn-main" onclick="openModal('postModal')">POSTAR</button>
+            <div class="user-profile" onclick="openModal('authModal')">
+                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=user" id="navAvatar" class="user-avatar">
+                <span id="navUser">ENTRAR</span>
             </div>
         </div>
-        
-        <div class="w-8 h-[2px] bg-[#35363c] rounded-full mx-auto"></div>
+    </header>
 
-        <!-- Servidor DevCord -->
-        <div class="relative group" onclick="switchServer('devcord', this)">
-            <div id="indicator-devcord" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-white rounded-r-full group-hover:h-5 transition-all duration-200"></div>
-            <div class="server-icon w-12 h-12 bg-[#313338] rounded-[24px] flex items-center justify-center text-[#dbdee1] cursor-pointer overflow-hidden font-bold">
-                DC
+    <div class="container">
+        <div id="highSection">
+            <div class="section-title">MAIS CURTIDOS</div>
+            <div class="game-grid" id="highGrid"></div>
+        </div>
+        <div class="section-title">TODOS OS JOGOS</div>
+        <div class="game-grid" id="mainGrid"></div>
+    </div>
+
+    <div class="game-page" id="gamePage">
+        <div class="game-header">
+            <div id="pgTitle" style="font-weight: 900; text-transform: uppercase; color: var(--accent);">TITULO</div>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn-main" onclick="toggleFull()">TELA CHEIA</button>
+                <button class="btn-main" id="btnDelete" style="background:var(--danger); display:none;">APAGAR</button>
+                <button onclick="closeGame()" class="btn-main" style="background:#1e293b">FECHAR</button>
             </div>
         </div>
-
-        <div class="relative group" onclick="notImplemented('Adicionar Servidor')">
-            <div class="server-icon w-12 h-12 bg-[#313338] rounded-[24px] flex items-center justify-center text-[#23a559] cursor-pointer hover:bg-[#23a559] hover:text-white">
-                <i class="fa-solid fa-plus text-xl"></i>
-            </div>
-        </div>
-    </nav>
-
-    <!-- BARRA LATERAL DE CANAIS -->
-    <aside class="w-60 bg-[#2b2d31] flex flex-col">
-        <header class="h-12 px-4 flex items-center shadow-sm border-b border-[#1f2123] cursor-pointer hover:bg-[#35373c] transition-colors" onclick="notImplemented('Configurações do DevCord')">
-            <h1 id="server-name-display" class="font-bold text-white truncate mr-auto">DevCord</h1>
-            <i class="fa-solid fa-chevron-down text-sm"></i>
-        </header>
-
-        <div class="flex-1 overflow-y-auto scrollbar-hide py-3">
-            <!-- Categoria Desenvolvimento -->
-            <div class="px-2 mb-4">
-                <div class="flex items-center text-[#949ba4] uppercase text-[12px] font-bold px-2 mb-1 cursor-default hover:text-[#dbdee1]">
-                    <i class="fa-solid fa-chevron-down text-[8px] mr-1"></i>
-                    STACKS
-                </div>
-                <div onclick="switchChannel('geral')" id="chan-geral" class="channel-item active flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors mb-0.5">
-                    <i class="fa-solid fa-hashtag mr-1.5 text-lg"></i>
-                    <span class="font-medium">geral</span>
-                </div>
-                <div onclick="switchChannel('frontend')" id="chan-frontend" class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors mb-0.5">
-                    <i class="fa-solid fa-hashtag mr-1.5 text-lg"></i>
-                    <span class="font-medium">frontend</span>
-                </div>
-                <div onclick="switchChannel('backend')" id="chan-backend" class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors mb-0.5">
-                    <i class="fa-solid fa-hashtag mr-1.5 text-lg"></i>
-                    <span class="font-medium">backend</span>
-                </div>
-            </div>
-
-            <!-- Categoria Carreira -->
-            <div class="px-2 mb-4">
-                <div class="flex items-center text-[#949ba4] uppercase text-[12px] font-bold px-2 mb-1 cursor-default hover:text-[#dbdee1]">
-                    <i class="fa-solid fa-chevron-down text-[8px] mr-1"></i>
-                    CARREIRA
-                </div>
-                <div onclick="switchChannel('vagas')" id="chan-vagas" class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors mb-0.5">
-                    <i class="fa-solid fa-hashtag mr-1.5 text-lg"></i>
-                    <span class="font-medium">vagas</span>
-                </div>
-                <div onclick="switchChannel('code-review')" id="chan-code-review" class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors mb-0.5">
-                    <i class="fa-solid fa-hashtag mr-1.5 text-lg"></i>
-                    <span class="font-medium">code-review</span>
-                </div>
-            </div>
-
-            <!-- Canais de Voz -->
-            <div class="px-2">
-                <div class="flex items-center text-[#949ba4] uppercase text-[12px] font-bold px-2 mb-1 cursor-default hover:text-[#dbdee1]">
-                    <i class="fa-solid fa-chevron-down text-[8px] mr-1"></i>
-                    SALAS DE VOZ
-                </div>
-                <div class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors" onclick="notImplemented('Conectar ao Coffee Break')">
-                    <i class="fa-solid fa-volume-high mr-1.5"></i>
-                    <span class="font-medium">Coffee Break</span>
-                </div>
-                <div class="channel-item flex items-center px-2 py-1.5 rounded cursor-pointer text-[#949ba4] transition-colors" onclick="notImplemented('Conectar ao Pair Programming')">
-                    <i class="fa-solid fa-volume-high mr-1.5"></i>
-                    <span class="font-medium">Pair Programming</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Perfil do Usuário -->
-        <div class="h-14 bg-[#232428] px-2 flex items-center space-x-2">
-            <div class="relative cursor-pointer group" onclick="toggleStatus()">
-                <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold text-xs">
-                    DEV
-                </div>
-                <div id="user-status-dot" class="absolute bottom-0 right-0 w-3 h-3 status-online border-2 border-[#232428] rounded-full"></div>
-            </div>
-            <div class="flex-1 min-w-0 cursor-pointer" onclick="notImplemented('Editar Perfil')">
-                <div class="text-sm font-bold text-white leading-tight truncate">Desenvolvedor</div>
-                <div id="status-text" class="text-[12px] text-[#949ba4] leading-tight">Online</div>
-            </div>
-            <div class="flex space-x-1 text-[#b5bac1]">
-                <button onclick="toggleMute(this, 'mic')" class="w-8 h-8 flex items-center justify-center hover:bg-[#3f4147] rounded transition-colors" title="Silenciar Microfone"><i class="fa-solid fa-microphone"></i></button>
-                <button onclick="toggleMute(this, 'audio')" class="w-8 h-8 flex items-center justify-center hover:bg-[#3f4147] rounded transition-colors" title="Ensurdecer"><i class="fa-solid fa-headphones"></i></button>
-                <button onclick="notImplemented('Configurações do Usuário')" class="w-8 h-8 flex items-center justify-center hover:bg-[#3f4147] rounded transition-colors" title="Configurações"><i class="fa-solid fa-gear"></i></button>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL DO CHAT -->
-    <main class="flex-1 bg-[#313338] flex flex-col min-w-0">
-        <header class="h-12 px-4 flex items-center shadow-sm border-b border-[#1f2123]">
-            <i class="fa-solid fa-hashtag text-[#80848e] text-xl mr-2"></i>
-            <h2 id="channel-title" class="font-bold text-white mr-auto">geral</h2>
-            
-            <div class="flex items-center space-x-4 text-[#b5bac1]">
-                <i class="fa-solid fa-bell cursor-pointer hover:text-[#dbdee1]" title="Notificações" onclick="this.classList.toggle('text-white')"></i>
-                <i id="toggle-members-btn" class="fa-solid fa-user-group cursor-pointer text-white" title="Lista de Membros" onclick="toggleMembers()"></i>
-                <div class="relative">
-                    <input type="text" placeholder="Procurar" class="bg-[#1e1f22] text-sm px-2 py-0.5 rounded outline-none w-36 focus:w-60 transition-all duration-200">
-                </div>
-                <i class="fa-solid fa-circle-question cursor-pointer hover:text-[#dbdee1]" title="Ajuda" onclick="notImplemented('Ajuda')"></i>
-            </div>
-        </header>
-
-        <!-- Container de Mensagens Real -->
-        <div id="message-container" class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
-            <!-- Boas-vindas -->
-            <div class="flex flex-col items-start py-8 px-4" id="welcome-box">
-                <div class="w-16 h-16 rounded-full bg-[#41434a] flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-hashtag text-4xl text-white"></i>
-                </div>
-                <h1 class="text-3xl font-bold text-white mb-2">Bem-vindo(a) ao DevCord!</h1>
-                <p class="text-[#949ba4]">Este é o seu novo espaço de desenvolvimento. Comece a digitar para interagir.</p>
-            </div>
-        </div>
-
-        <!-- Input de Mensagem -->
-        <div class="px-4 pb-6">
-            <div class="bg-[#383a40] rounded-lg px-4 py-2.5 flex flex-col">
-                <div class="flex items-center">
-                    <button class="text-[#b5bac1] hover:text-[#dbdee1] mr-4" onclick="notImplemented('Upload de Arquivo')"><i class="fa-solid fa-circle-plus text-xl"></i></button>
-                    <form id="message-form" class="flex-1">
-                        <input id="message-input" type="text" placeholder="Conversar em #geral" class="bg-transparent w-full outline-none text-[#dbdee1] placeholder-[#949ba4]" autocomplete="off">
-                    </form>
-                    <div class="flex space-x-3 text-[#b5bac1] ml-4">
-                        <i class="fa-solid fa-face-smile cursor-pointer hover:text-[#dbdee1]" onclick="notImplemented('Emoji Picker')"></i>
+        <div class="game-body">
+            <div class="iframe-wrapper"><iframe src="" id="gameIframe" allowfullscreen></iframe></div>
+            <div style="width:100%; max-width:1100px; margin-top:30px; background:rgba(255,255,255,0.03); padding:30px; border-radius:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 id="descTitle" style="margin:0; text-transform: uppercase;"></h2>
+                    <div class="like-btn-container" id="likeBtn">
+                        <i data-lucide="heart" class="heart-icon"></i>
+                        <span id="likeCount" style="font-weight: 900; font-size: 1.2rem;">0</span>
                     </div>
                 </div>
+                <p id="descText" style="color: #94a3b8; line-height: 1.8; margin-top: 20px; font-size: 1.1rem;"></p>
             </div>
-        </div>
-    </main>
-
-    <!-- LISTA DE MEMBROS -->
-    <aside id="member-sidebar" class="w-60 bg-[#2b2d31] overflow-y-auto p-3 hidden lg:block scrollbar-hide">
-        <h3 class="text-[#949ba4] uppercase text-[12px] font-bold px-2 mb-2">Admin — 1</h3>
-        <div class="flex items-center space-x-3 p-2 rounded hover:bg-[#35373c] cursor-pointer group">
-            <div class="relative">
-                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold">SM</div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 status-online border-2 border-[#2b2d31] rounded-full"></div>
-            </div>
-            <span class="text-[#5865f2] font-bold">System Manager</span>
-        </div>
-
-        <h3 class="text-[#949ba4] uppercase text-[12px] font-bold px-2 mt-4 mb-2">Desenvolvedores — 3</h3>
-        <div id="online-members" class="space-y-1">
-            <div class="flex items-center space-x-3 p-2 rounded hover:bg-[#35373c] cursor-pointer group">
-                <div class="relative">
-                    <div class="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs font-bold">FE</div>
-                    <div class="absolute bottom-0 right-0 w-3 h-3 status-online border-2 border-[#2b2d31] rounded-full"></div>
-                </div>
-                <span class="text-[#949ba4] group-hover:text-white">FrontExpert</span>
-            </div>
-            <div class="flex items-center space-x-3 p-2 rounded hover:bg-[#35373c] cursor-pointer group">
-                <div class="relative">
-                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">BE</div>
-                    <div class="absolute bottom-0 right-0 w-3 h-3 status-idle border-2 border-[#2b2d31] rounded-full"></div>
-                </div>
-                <span class="text-[#949ba4] group-hover:text-white">BackDev</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Modal de Feedback -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden z-50">
-        <div class="bg-[#313338] p-6 rounded-lg shadow-2xl w-80 text-center border border-[#1f2123]">
-            <h2 class="text-white font-bold text-xl mb-2" id="modal-title">DevCord Info</h2>
-            <p class="text-[#dbdee1] mb-6" id="modal-body">Mensagem informativa.</p>
-            <button onclick="closeModal()" class="bg-[#5865f2] text-white px-6 py-2 rounded font-medium hover:bg-[#4752c4] transition-colors w-full">Fechar</button>
         </div>
     </div>
 
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModals()"></div>
+    <div class="modal-box" id="authModal">
+        <h2 style="margin-top:0">PERFIL</h2>
+        <input type="email" id="emailIn" placeholder="E-MAIL">
+        <input type="password" id="passIn" placeholder="SENHA">
+        <input type="text" id="nickIn" placeholder="NICKNAME">
+        <input type="text" id="picIn" placeholder="URL DA FOTO">
+        <button class="btn-main" style="width:100%" onclick="handleAuth()">SALVAR</button>
+    </div>
+
+    <div class="modal-box" id="postModal">
+        <h2 style="margin-top:0">NOVO JOGO</h2>
+        <input type="text" id="postTitle" placeholder="TITULO">
+        <input type="text" id="postPic" placeholder="URL DA CAPA">
+        <input type="text" id="postUrl" placeholder="URL DO JOGO">
+        <textarea id="postDesc" placeholder="DESCRICAO" rows="4"></textarea>
+        <button class="btn-main" style="width:100%" onclick="saveGame()">PUBLICAR</button>
+    </div>
+
     <script>
-        const messageForm = document.getElementById('message-form');
-        const messageInput = document.getElementById('message-input');
-        const messageContainer = document.getElementById('message-container');
-        const channelTitle = document.getElementById('channel-title');
-        const userStatusDot = document.getElementById('user-status-dot');
-        const statusText = document.getElementById('status-text');
-        const welcomeBox = document.getElementById('welcome-box');
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMHAKVot044psR421B_t-Ht5EmsueVS8A",
+            authDomain: "game-dev-space.firebaseapp.com",
+            databaseURL: "https://game-dev-space-default-rtdb.firebaseio.com",
+            projectId: "game-dev-space",
+            storageBucket: "game-dev-space.firebasestorage.app",
+            messagingSenderId: "1073185335190",
+            appId: "1:1073185335190:web:ae9ffd88cdf89f53cbdfb7"
+        };
 
-        let currentStatus = 'online';
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const ADMIN = "contapropredro@gmail.com";
+        let currentUser = JSON.parse(sessionStorage.getItem('gh_sess')) || null;
 
-        // Lógica de Mensagens Reais (Local Only)
-        messageForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if (text) {
-                // Remove a caixa de boas-vindas na primeira mensagem
-                if (welcomeBox) welcomeBox.style.display = 'none';
-                
-                addMessage('Você', text, 'slate-600');
-                messageInput.value = '';
+        function init() {
+            if(currentUser) {
+                document.getElementById('navUser').innerText = currentUser.nick.toUpperCase();
+                if(currentUser.pic) document.getElementById('navAvatar').src = currentUser.pic;
             }
-        });
+            db.collection("games").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+                const gamesList = [];
+                snapshot.forEach(doc => gamesList.push({ id: doc.id, ...doc.data() }));
+                render(gamesList);
+            });
+        }
 
-        function addMessage(user, text, color) {
-            const now = new Date();
-            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = "flex items-start space-x-4 message-hover p-1 -mx-1 rounded transition-all";
-            
-            // Detecta se é código para estilizar (ex: se começar com ``` ou for curto comando)
-            let contentHtml = `<p class="text-[#dbdee1] leading-relaxed whitespace-pre-wrap">${text}</p>`;
-            if (text.includes('console.') || text.includes('function') || text.includes('import ')) {
-                contentHtml = `<div class="code-snippet text-green-400 text-sm"><code>${text}</code></div>`;
-            }
+        function render(list) {
+            const mainGrid = document.getElementById('mainGrid');
+            const highGrid = document.getElementById('highGrid');
+            mainGrid.innerHTML = '';
+            list.forEach(g => mainGrid.innerHTML += createCard(g));
+            const sorted = [...list].sort((a,b) => (b.likes || 0) - (a.likes || 0)).slice(0, 4);
+            highGrid.innerHTML = '';
+            sorted.forEach(g => highGrid.innerHTML += createCard(g));
+            lucide.createIcons();
+        }
 
-            messageDiv.innerHTML = `
-                <div class="w-10 h-10 rounded-full bg-${color} flex-shrink-0 mt-1 flex items-center justify-center text-white font-bold text-xs uppercase">${user.substring(0,2)}</div>
-                <div>
-                    <div class="flex items-baseline space-x-2">
-                        <span class="font-bold text-white hover:underline cursor-pointer">${user}</span>
-                        <span class="text-[12px] text-[#949ba4]">${timeStr}</span>
+        function createCard(g) {
+            return `
+                <div class="game-card" onclick="openGame('${g.id}')">
+                    <img src="${g.pic || 'https://placehold.co/600x350/111827/8b5cf6?text=GAME'}" class="game-thumb">
+                    <div class="game-info">
+                        <div style="font-weight:900; text-transform: uppercase; font-size:0.8rem;">${g.title}</div>
+                        <div style="color:var(--accent); font-size:0.7rem; margin-top:8px; font-weight:900;">LIKES: ${g.likes || 0}</div>
                     </div>
-                    ${contentHtml}
                 </div>
             `;
-            messageContainer.appendChild(messageDiv);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
-        // Troca de Canais
-        function switchChannel(channelId) {
-            document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`chan-${channelId}`).classList.add('active');
-            
-            channelTitle.innerText = channelId;
-            messageInput.placeholder = `Conversar em #${channelId}`;
-            
-            // Limpa mensagens antigas ao trocar (simulando troca de contexto)
-            messageContainer.innerHTML = '';
-            
-            const channelHeader = document.createElement('div');
-            channelHeader.className = "py-8 px-4";
-            channelHeader.innerHTML = `
-                <h1 class="text-3xl font-bold text-white mb-1">#${channelId}</h1>
-                <p class="text-[#949ba4]">Este é o início do histórico do canal #${channelId}.</p>
-                <div class="h-[1px] bg-[#3f4147] w-full mt-6"></div>
-            `;
-            messageContainer.appendChild(channelHeader);
+        async function saveGame() {
+            if(!currentUser) return alert("FACA LOGIN");
+            const title = document.getElementById('postTitle').value;
+            const pic = document.getElementById('postPic').value;
+            const url = document.getElementById('postUrl').value;
+            const desc = document.getElementById('postDesc').value;
+            if(!title || !url) return alert("DADOS FALTANDO");
+            await db.collection("games").add({
+                title, pic, url, desc, likes: 0, likedBy: [],
+                author: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            closeModals();
         }
 
-        // Troca de Servidor
-        function switchServer(serverId, el) {
-            document.querySelectorAll('.server-icon').forEach(icon => icon.classList.remove('active'));
-            document.querySelectorAll('nav .absolute').forEach(indicator => indicator.classList.replace('h-5', 'h-0'));
-            
-            const icon = el.querySelector('.server-icon');
-            const indicator = el.querySelector('.absolute');
-            
-            icon.classList.add('active');
-            indicator.classList.replace('h-0', 'h-5');
-            
-            const name = serverId === 'home' ? 'Home' : 'DevCord';
-            document.getElementById('server-name-display').innerText = name;
+        async function openGame(id) {
+            const doc = await db.collection("games").doc(id).get();
+            const g = doc.data();
+            const likeBtn = document.getElementById('likeBtn');
+            document.getElementById('pgTitle').innerText = g.title;
+            document.getElementById('descTitle').innerText = g.title;
+            document.getElementById('descText').innerText = g.desc || "SEM DESCRICAO.";
+            document.getElementById('gameIframe').src = g.url;
+            document.getElementById('likeCount').innerText = g.likes || 0;
+            if(currentUser && g.likedBy?.includes(currentUser.email)) likeBtn.classList.add('liked');
+            else likeBtn.classList.remove('liked');
+            document.getElementById('gamePage').style.display = 'flex';
+            likeBtn.onclick = async () => {
+                if(!currentUser) return alert("FACA LOGIN");
+                const freshDoc = await db.collection("games").doc(id).get();
+                if(freshDoc.data().likedBy?.includes(currentUser.email)) return;
+                await db.collection("games").doc(id).update({
+                    likes: firebase.firestore.FieldValue.increment(1),
+                    likedBy: firebase.firestore.FieldValue.arrayUnion(currentUser.email)
+                });
+                likeBtn.classList.add('liked');
+            };
+            const delBtn = document.getElementById('btnDelete');
+            if(currentUser && (currentUser.email === g.author || currentUser.email === ADMIN)) {
+                delBtn.style.display = 'block';
+                delBtn.onclick = async () => {
+                    if(confirm("APAGAR?")) { await db.collection("games").doc(id).delete(); closeGame(); }
+                };
+            } else delBtn.style.display = 'none';
         }
 
-        // Interface Funcional
-        function toggleMembers() {
-            const sidebar = document.getElementById('member-sidebar');
-            const btn = document.getElementById('toggle-members-btn');
-            sidebar.classList.toggle('hidden');
-            btn.classList.toggle('text-white');
-            btn.classList.toggle('text-[#b5bac1]');
+        function handleAuth() {
+            const email = document.getElementById('emailIn').value;
+            const nick = document.getElementById('nickIn').value;
+            const pic = document.getElementById('picIn').value;
+            if(!email) return alert("E-MAIL REQUERIDO");
+            currentUser = { email, nick: nick || "PLAYER", pic: pic || "" };
+            sessionStorage.setItem('gh_sess', JSON.stringify(currentUser));
+            location.reload();
         }
 
-        function toggleMute(btn, type) {
-            btn.classList.toggle('muted');
-            const icon = btn.querySelector('i');
-            if (type === 'mic') {
-                icon.classList.toggle('fa-microphone');
-                icon.classList.toggle('fa-microphone-slash');
-            } else {
-                icon.classList.toggle('fa-headphones');
-                icon.classList.toggle('fa-headphones-simple');
-            }
+        function searchGames() {
+            const t = document.getElementById('searchInput').value.toLowerCase();
+            db.collection("games").get().then(snap => {
+                const filtered = [];
+                snap.forEach(doc => { if(doc.data().title.toLowerCase().includes(t)) filtered.push({id: doc.id, ...doc.data()}); });
+                render(filtered);
+                document.getElementById('highSection').style.display = t ? 'none' : 'block';
+            });
         }
 
-        function toggleStatus() {
-            const statuses = ['online', 'dnd', 'idle'];
-            let nextIndex = (statuses.indexOf(currentStatus) + 1) % statuses.length;
-            currentStatus = statuses[nextIndex];
-            
-            userStatusDot.className = `absolute bottom-0 right-0 w-3 h-3 border-2 border-[#232428] rounded-full status-${currentStatus}`;
-            const label = { 'online': 'Online', 'dnd': 'Não Perturbe', 'idle': 'Ausente' };
-            statusText.innerText = label[currentStatus];
-        }
+        function toggleFull() { const el = document.getElementById("gameIframe"); if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); }
+        function openModal(id) { document.getElementById('modalOverlay').style.display='block'; document.getElementById(id).style.display='block'; }
+        function closeModals() { document.getElementById('modalOverlay').style.display='none'; document.getElementById('authModal').style.display='none'; document.getElementById('postModal').style.display='none'; }
+        function closeGame() { document.getElementById('gamePage').style.display='none'; document.getElementById('gameIframe').src=''; }
 
-        function notImplemented(feature) {
-            document.getElementById('modal-title').innerText = "Recurso em Desenvolvimento";
-            document.getElementById('modal-body').innerText = `O recurso "${feature}" será implementado na próxima release do DevCord.`;
-            document.getElementById('modal-overlay').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.add('hidden');
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+        init();
     </script>
 </body>
 </html>
