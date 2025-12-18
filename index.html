@@ -12,10 +12,10 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.4); }
+:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.4); --bg: #050510; }
 *{box-sizing:border-box; font-family: 'Inter', sans-serif;}
 
-body { margin:0; color:#fff; background:#050510; overflow-x: hidden; }
+body { margin:0; color:#fff; background: var(--bg); overflow-x: hidden; }
 
 /* Fundo Animado Tech */
 .bg-tech {
@@ -32,32 +32,22 @@ body { margin:0; color:#fff; background:#050510; overflow-x: hidden; }
 }
 @keyframes move-bg { from { transform: translateY(0); } to { transform: translateY(50px); } }
 
-header {
-    padding: 60px 20px 40px; text-align: center;
-    background: linear-gradient(to bottom, rgba(10,10,25,0.9), transparent);
-}
-
+header { padding: 60px 20px 40px; text-align: center; }
 header h1 {
-    font-family: 'Orbitron', sans-serif; font-size: clamp(32px, 8vw, 50px); margin: 0;
+    font-family: 'Orbitron', sans-serif; font-size: clamp(30px, 7vw, 55px); margin: 0;
     color: var(--neon); text-shadow: 0 0 20px var(--glow); letter-spacing: 4px;
 }
 
-.search-bar {
-    margin: 30px auto 0; width: 100%; max-width: 600px; position: relative;
-}
+.search-bar { margin: 30px auto 0; width: 100%; max-width: 600px; }
 .search-bar input {
     width: 100%; padding: 15px 25px; border-radius: 30px; border: 1px solid rgba(34, 197, 94, 0.3);
-    background: rgba(0,0,0,0.4); color: #fff; font-size: 16px; outline: none;
-    backdrop-filter: blur(5px); transition: 0.3s;
+    background: rgba(0,0,0,0.6); color: #fff; font-size: 16px; outline: none; transition: 0.3s;
 }
 .search-bar input:focus { border-color: var(--neon); box-shadow: 0 0 15px var(--glow); }
 
-.top-nav { position: absolute; right: 20px; top: 20px; display: flex; gap: 15px; }
+.top-nav { position: absolute; right: 20px; top: 20px; display: flex; gap: 10px; }
 
-button { background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-button:hover { transform: scale(1.05); filter: brightness(1.1); }
-
-/* Grid e Efeito Glow nos Jogos */
+/* Estilo dos Cards com Glow */
 main { max-width: 1300px; margin: auto; padding: 20px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
@@ -67,25 +57,25 @@ main { max-width: 1300px; margin: auto; padding: 20px; }
     transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
 }
 .card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--glow);
+    transform: translateY(-10px);
+    box-shadow: 0 0 25px var(--glow);
     border-color: var(--neon);
 }
-.card img { width: 100%; height: 160px; object-fit: cover; transition: 0.5s; }
-.card:hover img { filter: contrast(1.1); }
+.card img { width: 100%; height: 160px; object-fit: cover; }
+.card-info { padding: 15px; text-align: center; }
 
-.card-info { padding: 15px; }
-.card-info h3 { margin: 0; font-size: 18px; color: #eee; }
-.like-tag { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.75); padding: 4px 10px; border-radius: 12px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); }
+/* Modais */
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
+.modal-box { background: #0f1025; padding: 30px; border-radius: 20px; border: 1px solid var(--neon); width: 90%; max-width: 400px; }
+.modal-box input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #050510; color: #fff; }
 
-#gameView { display: none; padding: 40px 20px; max-width: 1000px; margin: auto; }
-.iframe-container { width: 100%; height: 600px; background: #000; border-radius: 20px; border: 2px solid var(--neon); overflow: hidden; margin-top: 20px; }
+button { background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+button:hover { transform: scale(1.05); }
+.btn-block { width: 100%; margin-top: 10px; padding: 15px; }
+
+#gameView { display: none; padding: 20px; text-align: center; }
+.iframe-container { width: 100%; height: 70vh; background: #000; border-radius: 20px; border: 2px solid var(--neon); margin: 20px 0; }
 iframe { width: 100%; height: 100%; border: none; }
-
-#loginModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
-.modal-box { background: #0f1025; padding: 40px; border-radius: 25px; border: 1px solid var(--neon); text-align: center; width: 90%; max-width: 400px; }
-
-footer { text-align: center; padding: 60px; opacity: 0.4; font-size: 14px; letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -94,32 +84,32 @@ footer { text-align: center; padding: 60px; opacity: 0.4; font-size: 14px; lette
 
 <header>
     <div class="top-nav">
-        <button id="adminLoginBtn" style="background:#22c55e">Admin</button>
-        <button id="loginBtn">Login</button>
+        <button id="adminBtn" style="background:#22c55e">Admin</button>
+        <button id="loginOpenBtn">Entrar / Criar Conta</button>
         <button id="logoutBtn" style="display:none">Sair</button>
     </div>
     <h1>GAME DEV SPACE</h1>
     <div class="search-bar">
-        <input type="text" id="searchInp" placeholder="Pesquisar jogo na biblioteca...">
+        <input type="text" id="searchInp" placeholder="Procurar um jogo...">
     </div>
 </header>
 
-<div id="loginModal">
+<div id="authModal" class="modal">
     <div class="modal-box">
-        <h2 style="font-family:Orbitron">ENTRAR</h2>
-        <button onclick="googleAuth()" style="width:100%; padding:15px; margin-bottom:10px">Google Login</button>
-        <button onclick="closeModals()" style="background:transparent; color:#888">Cancelar</button>
+        <h2 id="authTitle" style="font-family:Orbitron; text-align:center">LOGIN</h2>
+        <input type="email" id="emailInp" placeholder="Seu e-mail">
+        <input type="password" id="passInp" placeholder="Sua senha">
+        <button class="btn-block" id="primaryAuthBtn">Entrar</button>
+        <button class="btn-block" style="background:transparent; color:var(--neon)" id="switchAuthBtn">Não tem conta? Registre-se</button>
+        <button class="btn-block" style="background:transparent; color:#888" onclick="closeModals()">Cancelar</button>
     </div>
 </div>
 
 <main id="home">
-    <h2 id="listTitle" style="margin-bottom:25px; font-weight: 300; color: #888;">EXPLORAR JOGOS</h2>
-    <div class="grid" id="mainGrid"></div>
+    <div class="grid" id="mainGrid" style="margin-top: 20px;"></div>
 </main>
 
 <main id="gameView"></main>
-
-<footer>GAME DEV SPACE • TECH V2</footer>
 
 <script>
 // Firebase Config
@@ -133,47 +123,54 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-let currentUser = null;
+let isRegisterMode = false;
 let isAdmin = false;
 let allGames = [];
 
-// Gerenciamento de Admin
-adminLoginBtn.onclick = () => {
-    const pass = prompt("Senha de Acesso:");
-    if(pass === "15423993945") {
-        isAdmin = true;
-        alert("Modo Administrador Ativado!");
-        const action = confirm("Deseja postar um novo jogo?");
-        if(action) postGame();
+// Funções de Interface
+const closeModals = () => authModal.style.display = "none";
+loginOpenBtn.onclick = () => authModal.style.display = "flex";
+
+switchAuthBtn.onclick = () => {
+    isRegisterMode = !isRegisterMode;
+    authTitle.innerText = isRegisterMode ? "CRIAR CONTA" : "LOGIN";
+    primaryAuthBtn.innerText = isRegisterMode ? "Cadastrar" : "Entrar";
+    switchAuthBtn.innerText = isRegisterMode ? "Já tem conta? Entre aqui" : "Não tem conta? Registre-se";
+};
+
+// Lógica de Auth (E-mail e Senha)
+primaryAuthBtn.onclick = () => {
+    const email = emailInp.value;
+    const pass = passInp.value;
+    if(isRegisterMode) {
+        auth.createUserWithEmailAndPassword(email, pass).then(closeModals).catch(e => alert(e.message));
     } else {
-        alert("Senha incorreta.");
+        auth.signInWithEmailAndPassword(email, pass).then(closeModals).catch(e => alert(e.message));
     }
 };
 
-function postGame() {
-    const name = prompt("Nome do Jogo:");
-    const img = prompt("URL da Capa:");
-    const url = prompt("Link do Jogo (URL):");
-    if(name && url) {
-        db.ref("games").push({ name, img, url, likes: 0, date: Date.now() });
-    }
-}
-
-// Auth
-loginBtn.onclick = () => loginModal.style.display = "flex";
-function closeModals() { loginModal.style.display = "none"; }
-function googleAuth() {
-    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(closeModals);
-}
 logoutBtn.onclick = () => { auth.signOut(); isAdmin = false; };
 
 auth.onAuthStateChanged(user => {
-    currentUser = user;
-    loginBtn.style.display = user ? "none" : "block";
+    loginOpenBtn.style.display = user ? "none" : "block";
     logoutBtn.style.display = user ? "block" : "none";
 });
 
-// Busca e Renderização
+// Painel Admin
+adminBtn.onclick = () => {
+    const pass = prompt("Senha de Admin:");
+    if(pass === "15423993945") {
+        isAdmin = true;
+        const name = prompt("Nome do Jogo:");
+        const img = prompt("URL da Imagem:");
+        const url = prompt("Link do Jogo:");
+        if(name && url) db.ref("games").push({ name, img, url, date: Date.now() });
+    } else {
+        alert("Senha incorreta!");
+    }
+};
+
+// Renderização e Busca
 db.ref("games").on("value", snap => {
     const data = snap.val() || {};
     allGames = Object.entries(data).map(([id, g]) => ({ id, ...g }));
@@ -182,14 +179,10 @@ db.ref("games").on("value", snap => {
 
 function render(list) {
     mainGrid.innerHTML = "";
-    list.sort((a,b) => b.date - a.date).forEach(g => {
+    list.forEach(g => {
         const item = document.createElement("div");
         item.className = "card";
-        item.innerHTML = `
-            <div class="like-tag">❤ ${g.likes || 0}</div>
-            <img src="${g.img || 'https://via.placeholder.com/400x200/0f1025/ffffff?text=Game+Image'}">
-            <div class="card-info"><h3>${g.name}</h3></div>
-        `;
+        item.innerHTML = `<img src="${g.img || ''}"><div class="card-info"><h3>${g.name}</h3></div>`;
         item.onclick = () => openGame(g);
         mainGrid.appendChild(item);
     });
@@ -197,9 +190,7 @@ function render(list) {
 
 searchInp.oninput = (e) => {
     const term = e.target.value.toLowerCase();
-    const filtered = allGames.filter(g => g.name.toLowerCase().includes(term));
-    render(filtered);
-    document.getElementById("listTitle").innerText = term ? `RESULTADOS PARA: ${term.toUpperCase()}` : "EXPLORAR JOGOS";
+    render(allGames.filter(g => g.name.toLowerCase().includes(term)));
 };
 
 function openGame(g) {
@@ -207,33 +198,17 @@ function openGame(g) {
     gameView.style.display = "block";
     gameView.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button onclick="backHome()">← VOLTAR</button>
-            <h2 style="font-family:Orbitron; color:var(--neon)">${g.name.toUpperCase()}</h2>
-            ${isAdmin ? `<button onclick="delGame('${g.id}')" style="background:#ef4444">DELETAR POST</button>` : `<div></div>`}
+            <button onclick="back()">← Voltar</button>
+            <h2 style="font-family:Orbitron">${g.name}</h2>
+            ${isAdmin ? `<button onclick="del('${g.id}')" style="background:#ef4444">Deletar</button>` : '<div></div>'}
         </div>
-        <div class="iframe-container">
-            <iframe src="${g.url}"></iframe>
-        </div>
-        <div style="text-align:center; padding:20px;">
-            <button onclick="like('${g.id}')" style="font-size:18px; padding:15px 40px; background:var(--neon)">CURTIR JOGO</button>
-        </div>
+        <div class="iframe-container"><iframe src="${g.url}"></iframe></div>
     `;
-    window.scrollTo(0,0);
 }
 
-function delGame(id) {
-    if(confirm("Deseja realmente apagar este jogo da biblioteca?")) {
-        db.ref("games").child(id).remove();
-        backHome();
-    }
-}
+function del(id) { if(confirm("Apagar jogo?")) { db.ref("games").child(id).remove(); back(); } }
+function back() { gameView.style.display = "none"; home.style.display = "block"; }
 
-function backHome() { gameView.style.display = "none"; home.style.display = "block"; }
-
-function like(id) {
-    if(!currentUser) return alert("Faça login para curtir!");
-    db.ref("games").child(id).child("likes").transaction(l => (l || 0) + 1);
-}
 </script>
 </body>
 </html>
