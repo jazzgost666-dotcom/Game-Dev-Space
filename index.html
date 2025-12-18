@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Game Dev Space V3.0 - Estilo Steam</title>
+<title>Game Dev Space V3.0 - Fixed</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;800&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.6); --steam-bg: #171a21; --steam-blue: #66c0f4; }
+:root { --neon: #22c55e; --glow: rgba(34, 197, 94, 0.6); --steam-blue: #66c0f4; }
 *{box-sizing:border-box; font-family: 'Inter', sans-serif;}
 body { margin:0; color:#fff; background: #050510; overflow-x: hidden; }
 
@@ -24,38 +24,37 @@ header { padding: 40px 20px; text-align: center; }
 header h1 { font-family: 'Orbitron', sans-serif; font-size: 40px; color: var(--neon); text-shadow: 0 0 20px var(--glow); margin: 0; }
 
 .top-nav { position: absolute; right: 20px; top: 20px; display: flex; gap: 10px; align-items: center; }
-.user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; }
-.user-info img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--neon); }
+.user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid transparent; transition: 0.3s; }
+.user-info:hover { border-color: var(--neon); box-shadow: 0 0 10px var(--glow); }
+.user-info img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #222; }
 
 .search-container { margin: 20px auto; max-width: 600px; }
-.search-container input { width: 100%; padding: 15px; border-radius: 30px; border: 1px solid var(--neon); background: rgba(0,0,0,0.7); color: #fff; text-align: center; outline: none; }
+.search-container input { width: 100%; padding: 15px; border-radius: 30px; border: 2px solid rgba(34, 197, 94, 0.3); background: rgba(0,0,0,0.8); color: #fff; text-align: center; outline: none; transition: 0.3s; }
+.search-container input:focus { border-color: var(--neon); box-shadow: 0 0 20px var(--glow); }
 
 main { max-width: 1200px; margin: auto; padding: 20px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
 .card { background: #0f1025; border-radius: 15px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); position: relative; transition: 0.3s; }
 .card:hover { transform: translateY(-10px); box-shadow: 0 0 30px var(--glow); border-color: var(--neon); }
 .card img { width: 100%; height: 160px; object-fit: cover; }
-.likes-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 10px; color: var(--neon); font-size: 12px; }
+.card-info { padding: 15px; text-align: center; }
+.likes-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 10px; color: var(--neon); font-size: 12px; font-weight: bold; border: 1px solid var(--neon); }
 
-/* Comentários Estilo Steam */
-.steam-comments { max-width: 900px; margin: 40px auto; background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; border-top: 2px solid var(--steam-blue); }
-.comment-card { background: rgba(255,255,255,0.03); margin-bottom: 15px; padding: 15px; display: flex; gap: 15px; border-radius: 5px; }
-.comment-card img { width: 50px; height: 50px; border-radius: 4px; }
-.comment-body { flex: 1; }
-.comment-body header { text-align: left; padding: 0; display: flex; justify-content: space-between; margin-bottom: 10px; }
-.comment-body header strong { color: var(--steam-blue); font-size: 14px; }
-.comment-text { font-size: 14px; line-height: 1.5; color: #acb2b8; }
+.steam-comments { max-width: 900px; margin: 40px auto; background: rgba(23, 26, 33, 0.8); padding: 25px; border-radius: 4px; border-top: 2px solid var(--steam-blue); text-align: left; }
+.comment-card { background: rgba(0,0,0,0.2); margin-bottom: 12px; padding: 15px; display: flex; gap: 15px; border: 1px solid rgba(255,255,255,0.05); }
+.comment-card img { width: 45px; height: 45px; border-radius: 2px; border: 1px solid #333; }
+.comment-body strong { color: var(--steam-blue); }
 
-/* Modais */
 .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-.modal-box { background: #1b2838; padding: 30px; border-radius: 10px; border: 1px solid var(--steam-blue); width: 95%; max-width: 400px; }
-.modal-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #000; background: #101822; color: #fff; }
+.modal-box { background: #1b2838; padding: 30px; border-radius: 8px; border: 1px solid var(--steam-blue); width: 90%; max-width: 400px; }
+.modal-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 3px; border: 1px solid #000; background: #101822; color: #fff; }
 
-button { background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-.btn-steam { background: linear-gradient(to right, #47bfff, #1a44c2); }
+button { cursor: pointer; border: none; font-weight: bold; transition: 0.2s; }
+.btn-main { background: var(--neon); color: #000; padding: 10px 20px; border-radius: 20px; }
+.btn-steam { background: linear-gradient(to bottom, #47bfff 5%, #1a44c2 95%); color: #fff; padding: 10px 20px; }
 
 #gameView { display: none; text-align: center; }
-.iframe-container { width: 100%; height: 75vh; border: 2px solid var(--neon); border-radius: 10px; overflow: hidden; margin: 20px 0; }
+.iframe-container { width: 100%; height: 75vh; border: 2px solid var(--neon); border-radius: 8px; overflow: hidden; margin: 20px 0; background: #000; }
 iframe { width: 100%; height: 100%; border: none; }
 </style>
 </head>
@@ -65,38 +64,38 @@ iframe { width: 100%; height: 100%; border: none; }
 
 <header>
     <div class="top-nav">
-        <button id="adminBtn" style="background:var(--neon); color:#000; border-radius: 20px;">ADMIN</button>
+        <button id="adminBtn" class="btn-main">ADMIN</button>
         <div id="userProfileTrigger" class="user-info" style="display:none">
-            <img id="myAvatar" src="https://via.placeholder.com/50">
-            <span id="myUsername">Perfil</span>
+            <img id="myAvatar" src="">
+            <span id="myUsername">Carregando...</span>
         </div>
-        <button id="loginOpenBtn">LOGIN</button>
-        <button id="logoutBtn" style="display:none; background:#ef4444">SAIR</button>
+        <button id="loginOpenBtn" class="btn-main">LOGIN</button>
+        <button id="logoutBtn" style="display:none; background:#ef4444; color:white; padding:10px; border-radius:20px;">SAIR</button>
     </div>
     <h1>GAME DEV SPACE</h1>
     <div class="search-container">
-        <input type="text" id="searchInp" placeholder="BUSCAR JOGO NA BIBLIOTECA...">
+        <input type="text" id="searchInp" placeholder="PESQUISAR JOGO (SÓ O RESULTADO APARECERÁ)">
     </div>
 </header>
 
 <div id="profileModal" class="modal">
     <div class="modal-box">
-        <h2 style="font-family:Orbitron; color:var(--steam-blue)">MEU PERFIL</h2>
-        <input type="text" id="profNick" placeholder="Apelido/Username">
+        <h2 style="font-family:Orbitron; color:var(--steam-blue)">EDITAR PERFIL</h2>
+        <input type="text" id="profNick" placeholder="Nome de Exibição">
         <input type="text" id="profPic" placeholder="Link da Foto (URL)">
-        <input type="text" id="profLink" placeholder="Link Rede Social (Instagram/GitHub)">
-        <button class="btn-steam" style="width:100%" onclick="saveProfile()">SALVAR PERFIL</button>
-        <button style="width:100%; background:transparent; margin-top:10px" onclick="document.getElementById('profileModal').style.display='none'">CANCELAR</button>
+        <input type="text" id="profLink" placeholder="Link da Rede Social">
+        <button class="btn-steam" style="width:100%" onclick="saveProfile()">SALVAR MUDANÇAS</button>
+        <button style="width:100%; background:transparent; color:#888; margin-top:10px" onclick="document.getElementById('profileModal').style.display='none'">VOLTAR</button>
     </div>
 </div>
 
 <div id="authModal" class="modal">
     <div class="modal-box">
-        <h2 id="authTitle" style="font-family:Orbitron">LOGIN</h2>
+        <h2 id="authTitle" style="font-family:Orbitron">LOGIN / CADASTRO</h2>
         <input type="email" id="emailInp" placeholder="E-mail">
         <input type="password" id="passInp" placeholder="Senha">
         <button class="btn-steam" style="width:100%" id="primaryAuthBtn">ENTRAR</button>
-        <button style="width:100%; background:transparent; margin-top:10px" onclick="closeModals()">FECHAR</button>
+        <button style="width:100%; background:transparent; color:#888; margin-top:10px" onclick="authModal.style.display='none'">CANCELAR</button>
     </div>
 </div>
 
@@ -120,64 +119,73 @@ const db = firebase.database();
 const MASTER_PASS = "15423993946";
 let isAdminActive = false;
 let allGames = [];
-let myProfileData = {};
+let userProfile = { nick: "Usuário", pic: "https://www.gravatar.com/avatar/0?d=mp", link: "#" };
 
-// Gerenciamento de Perfil
-userProfileTrigger.onclick = () => document.getElementById('profileModal').style.display = 'flex';
+// Busca e Filtro Real
+searchInp.oninput = (e) => {
+    const val = e.target.value.toLowerCase();
+    if(!val) { render(allGames); return; }
+    const filtered = allGames.filter(g => g.name.toLowerCase().includes(val));
+    render(filtered);
+};
 
+// Gerenciar Perfil
 function saveProfile() {
     const user = auth.currentUser;
     if(!user) return;
     const data = {
-        nick: profNick.value,
-        pic: profPic.value || "https://via.placeholder.com/50",
-        link: profLink.value
+        nick: profNick.value || "Jogador",
+        pic: profPic.value || "https://www.gravatar.com/avatar/0?d=mp",
+        link: profLink.value || "#"
     };
-    db.ref("profiles").child(user.uid).set(data).then(() => {
-        alert("Perfil atualizado!");
+    db.ref("profiles/" + user.uid).set(data).then(() => {
+        alert("Perfil salvo!");
         document.getElementById('profileModal').style.display = 'none';
     });
 }
 
-// Auth
-const closeModals = () => authModal.style.display = "none";
-loginOpenBtn.onclick = () => authModal.style.display = "flex";
-
-primaryAuthBtn.onclick = () => {
-    const e = emailInp.value, p = passInp.value;
-    auth.signInWithEmailAndPassword(e, p).then(closeModals).catch(() => auth.createUserWithEmailAndPassword(e, p).then(closeModals));
-};
-
+// Auth State
 auth.onAuthStateChanged(user => {
     loginOpenBtn.style.display = user ? "none" : "block";
     logoutBtn.style.display = user ? "block" : "none";
     userProfileTrigger.style.display = user ? "flex" : "none";
     if(user) {
-        db.ref("profiles").child(user.uid).on("value", snap => {
-            myProfileData = snap.val() || {};
-            myAvatar.src = myProfileData.pic || "https://via.placeholder.com/50";
-            myUsername.innerText = myProfileData.nick || "Perfil";
-            profNick.value = myProfileData.nick || "";
-            profPic.value = myProfileData.pic || "";
-            profLink.value = myProfileData.link || "";
+        db.ref("profiles/" + user.uid).on("value", snap => {
+            if(snap.val()) {
+                userProfile = snap.val();
+                myAvatar.src = userProfile.pic;
+                myUsername.innerText = userProfile.nick;
+                profNick.value = userProfile.nick;
+                profPic.value = userProfile.pic;
+                profLink.value = userProfile.link;
+            }
         });
     }
 });
-logoutBtn.onclick = () => { auth.signOut(); isAdminActive = false; location.reload(); };
+
+loginOpenBtn.onclick = () => authModal.style.display = "flex";
+userProfileTrigger.onclick = () => profileModal.style.display = "flex";
+logoutBtn.onclick = () => { auth.signOut(); location.reload(); };
+
+primaryAuthBtn.onclick = () => {
+    const e = emailInp.value, p = passInp.value;
+    auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p))
+    .then(() => authModal.style.display = "none");
+};
 
 // Admin
 adminBtn.onclick = () => {
-    if(prompt("SENHA ADMIN:") === MASTER_PASS) {
+    if(prompt("SENHA:") === MASTER_PASS) {
         isAdminActive = true;
-        alert("ADMIN ON!");
-        const n = prompt("NOME:"), i = prompt("URL IMAGEM:"), u = prompt("URL JOGO:");
+        const n = prompt("NOME:"), i = prompt("URL CAPA:"), u = prompt("URL JOGO:");
         if(n && u) db.ref("games").push({ name: n, img: i, url: u, likes: 0, date: Date.now() });
     }
 };
 
-// Render e Ranking
+// Banco de Dados em Tempo Real
 db.ref("games").on("value", snap => {
-    allGames = Object.entries(snap.val() || {}).map(([id, g]) => ({ id, ...g }));
+    allGames = [];
+    snap.forEach(child => { allGames.push({ id: child.key, ...child.val() }); });
     render(allGames);
 });
 
@@ -186,87 +194,78 @@ function render(list) {
     list.sort((a,b) => (b.likes || 0) - (a.likes || 0)).forEach(g => {
         const item = document.createElement("div");
         item.className = "card";
-        item.innerHTML = `<div class="likes-badge">❤ ${g.likes || 0}</div><img src="${g.img || ''}"><div class="card-info"><h3>${g.name.toUpperCase()}</h3></div>`;
-        item.onclick = () => openGame(g);
+        item.innerHTML = `<div class="likes-badge">❤ ${g.likes || 0}</div><img src="${g.img}"><div class="card-info"><h3>${g.name.toUpperCase()}</h3></div>`;
+        item.onclick = () => openGame(g.id);
         mainGrid.appendChild(item);
     });
 }
 
-searchInp.oninput = (e) => {
-    const t = e.target.value.toLowerCase();
-    render(allGames.filter(g => g.name.toLowerCase().includes(t)));
-};
-
-// Página do Jogo Estilo Steam
-function openGame(g) {
-    home.style.display = "none";
-    gameView.style.display = "block";
-    gameView.innerHTML = `
-        <div style="display:flex; justify-content:space-between; max-width:1000px; margin:auto;">
-            <button onclick="back()">← VOLTAR</button>
-            <h2 style="font-family:Orbitron; color:var(--neon)">${g.name}</h2>
-            ${isAdminActive ? `<button onclick="del('${g.id}')" style="background:#ef4444">DELETAR</button>` : '<div></div>'}
-        </div>
-        <div class="iframe-container"><iframe src="${g.url}"></iframe></div>
-        <button onclick="like('${g.id}')" style="padding:15px 40px; font-size:18px; background:var(--neon); color:#000; border-radius:30px">CURTIR ❤ (${g.likes || 0})</button>
-        
-        <div class="steam-comments">
-            <h3 style="color:#fff; text-align:left">COMENTÁRIOS DOS USUÁRIOS</h3>
-            <div style="display:flex; gap:10px; margin-bottom:30px;">
-                <textarea id="comInp" placeholder="Deixe sua análise..." style="flex:1; height:80px; background:#101822; color:#fff; border:1px solid #333; padding:10px; border-radius:4px;"></textarea>
-                <button class="btn-steam" onclick="postComment('${g.id}')">PUBLICAR</button>
+function openGame(gameId) {
+    db.ref("games/" + gameId).on("value", snap => {
+        const g = snap.val();
+        if(!g) return;
+        home.style.display = "none";
+        gameView.style.display = "block";
+        gameView.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; max-width:1000px; margin:auto">
+                <button class="btn-main" onclick="back()">← VOLTAR</button>
+                <h2 style="font-family:Orbitron; color:var(--neon)">${g.name}</h2>
+                ${isAdminActive ? `<button onclick="del('${gameId}')" style="background:red; color:white; padding:10px">APAGAR</button>` : "<div></div>"}
             </div>
-            <div id="commentsList"></div>
-        </div>
-    `;
-    loadComments(g.id);
+            <div class="iframe-container"><iframe src="${g.url}"></iframe></div>
+            <button class="btn-main" onclick="addLike('${gameId}')" style="font-size:20px; padding:15px 50px">CURTIR ❤ (${g.likes || 0})</button>
+            <div class="steam-comments">
+                <h3>ANÁLISES DOS USUÁRIOS</h3>
+                <div style="display:flex; gap:10px; margin-bottom:20px">
+                    <textarea id="comTxt" placeholder="Escreva sua análise..." style="flex:1; background:#101822; color:white; border:1px solid #333; padding:10px;"></textarea>
+                    <button class="btn-steam" onclick="sendComment('${gameId}')">POSTAR</button>
+                </div>
+                <div id="commList"></div>
+            </div>
+        `;
+        loadComments(gameId);
+    });
 }
 
-function postComment(gameId) {
-    const text = document.getElementById("comInp").value;
-    if(!text || !auth.currentUser) return alert("Faça login e escreva algo!");
-    db.ref("comments").child(gameId).push({
-        nick: myProfileData.nick || auth.currentUser.email,
-        pic: myProfileData.pic || "https://via.placeholder.com/50",
-        link: myProfileData.link || "",
-        text: text,
+function addLike(id) {
+    if(!auth.currentUser) return alert("Logue para curtir!");
+    db.ref("games/" + id + "/likes").transaction(c => (c || 0) + 1);
+}
+
+function sendComment(id) {
+    const t = document.getElementById("comTxt").value;
+    if(!t || !auth.currentUser) return alert("Logue e escreva!");
+    db.ref("comments/" + id).push({
+        nick: userProfile.nick,
+        pic: userProfile.pic,
+        link: userProfile.link,
+        text: t,
         date: new Date().toLocaleDateString()
     });
-    document.getElementById("comInp").value = "";
+    document.getElementById("comTxt").value = "";
 }
 
-function loadComments(gameId) {
-    db.ref("comments").child(gameId).on("value", snap => {
-        const list = document.getElementById("commentsList");
+function loadComments(id) {
+    db.ref("comments/" + id).on("value", snap => {
+        const list = document.getElementById("commList");
         if(!list) return;
         list.innerHTML = "";
-        Object.values(snap.val() || {}).reverse().forEach(c => {
-            list.innerHTML += `
+        snap.forEach(c => {
+            const val = c.val();
+            list.innerHTML = `
                 <div class="comment-card">
-                    <a href="${c.link || '#'}" target="_blank"><img src="${c.pic}"></a>
+                    <a href="${val.link}" target="_blank"><img src="${val.pic}"></a>
                     <div class="comment-body">
-                        <header><strong>${c.nick}</strong> <small style="color:#666">${c.date}</small></header>
-                        <div class="comment-text">${c.text}</div>
+                        <strong>${val.nick}</strong> <small style="color:#555"> - ${val.date}</small>
+                        <p style="margin:5px 0; color:#ccc">${val.text}</p>
                     </div>
-                </div>`;
+                </div>` + list.innerHTML;
         });
     });
 }
 
-function like(id) {
-    if(!auth.currentUser) return alert("Login necessário!");
-    db.ref("games").child(id).child("likes").transaction(l => (l || 0) + 1);
-}
-
-function del(id) {
-    if(prompt("SENHA PARA APAGAR:") === MASTER_PASS) {
-        db.ref("games").child(id).remove();
-        db.ref("comments").child(id).remove();
-        back();
-    }
-}
-
-function back() { gameView.style.display = "none"; home.style.display = "block"; }
+function del(id) { if(prompt("SENHA:") === MASTER_PASS) db.ref("games/" + id).remove().then(back); }
+function back() { gameView.style.display="none"; home.style.display="block"; }
 </script>
 </body>
 </html>
