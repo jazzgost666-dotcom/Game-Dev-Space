@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameHUB | My Portal</title>
+    <title>GameHUB | Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -13,6 +13,7 @@
             --accent: #8b5cf6;
             --card-bg: rgba(30, 41, 59, 0.7);
             --text: #f8fafc;
+            --danger: #ef4444;
         }
 
         body {
@@ -33,7 +34,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        /* Header e Busca */
         header {
             display: flex;
             justify-content: space-between;
@@ -47,79 +47,44 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .search-container {
-            flex-grow: 1;
-            max-width: 500px;
-            margin: 0 20px;
-            position: relative;
-        }
-
+        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
         .search-container input {
-            width: 100%;
-            padding: 10px 40px;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.3);
-            color: white;
-            outline: none;
+            width: 100%; padding: 10px 40px; border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; outline: none;
         }
-
         .search-icon { position: absolute; left: 15px; top: 10px; color: #64748b; }
 
-        /* Perfil e Botão Postar */
         .nav-actions { display: flex; align-items: center; gap: 15px; }
         
         .user-profile {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 12px;
-            border-radius: 50px;
-            background: var(--card-bg);
-            border: 1px solid var(--accent);
-            transition: 0.3s;
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+            padding: 5px 12px; border-radius: 50px; background: var(--card-bg);
+            border: 1px solid var(--accent); transition: 0.3s;
         }
 
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #334155; }
 
-        /* Grid */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; margin-top: 30px; }
 
         .game-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.4s;
-            cursor: pointer;
+            background: var(--card-bg); border-radius: 15px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.4s; cursor: pointer;
         }
-
         .game-card:hover { transform: scale(1.03); border-color: var(--accent); }
         .game-thumb { width: 100%; height: 150px; object-fit: cover; }
         .game-info { padding: 15px; }
         .game-title { font-weight: bold; font-size: 1.1rem; }
-        .like-badge { display: flex; align-items: center; gap: 5px; color: #ef4444; margin-top: 8px; font-size: 0.9rem; }
 
-        /* Modal Jogo (Estilo Poki) */
         .poki-view {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-dark); z-index: 2000; display: none; flex-direction: column;
         }
-
         .poki-toolbar { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; background: #1e293b; }
         .poki-frame { flex-grow: 1; border: none; width: 100%; height: 100%; background: #000; }
 
-        /* Modais de Form */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); z-index: 1000; display: none; 
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.85); z-index: 1000; display: none; backdrop-filter: blur(5px);
         }
         .modal-box {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -138,6 +103,8 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
+        .btn-danger { background: var(--danger); }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -155,42 +122,46 @@
             <button class="btn-main" onclick="openPostModal()" style="width: auto;">
                 <i data-lucide="plus"></i> Postar
             </button>
-            <div class="user-profile" onclick="openProfileModal()">
+            <div class="user-profile" onclick="openAuthModal()">
                 <img src="" id="userImg" class="user-avatar">
-                <span id="userName">Entrar</span>
+                <span id="userName">Entrar / Registrar</span>
             </div>
         </div>
     </header>
 
     <div class="container">
         <h2 id="sectionTitle">Mais Recentes</h2>
-        <div class="game-grid" id="mainGrid">
-            </div>
+        <div class="game-grid" id="mainGrid"></div>
     </div>
 
     <div class="modal-overlay" id="overlay" onclick="closeModals()"></div>
-    <div class="modal-box" id="profileModal">
-        <h3>Meu Perfil</h3>
-        <input type="text" id="regName" placeholder="Seu Nickname">
-        <input type="text" id="regPic" placeholder="URL da foto de perfil">
-        <button class="btn-main" onclick="saveProfile()">Salvar Dados</button>
+    <div class="modal-box" id="authModal">
+        <h3 id="authTitle">Login</h3>
+        <input type="email" id="authEmail" placeholder="E-mail">
+        <input type="password" id="authPass" placeholder="Senha">
+        <input type="text" id="authNick" placeholder="Nickname (apenas registro)">
+        <input type="text" id="authPic" placeholder="URL da foto (apenas registro)">
+        <button class="btn-main" onclick="handleAuth()">Entrar / Registrar</button>
+        <p style="font-size: 0.8rem; text-align: center; color: #94a3b8; margin-top: 15px;">Se o e-mail não existir, criaremos uma conta nova!</p>
     </div>
 
     <div class="modal-box" id="postModal">
         <h3>Postar Novo Jogo</h3>
         <input type="text" id="gameTitle" placeholder="Título">
         <input type="text" id="gamePic" placeholder="URL da Capa">
-        <input type="text" id="gameUrl" placeholder="Link do Jogo (URL)">
-        <textarea id="gameDesc" placeholder="Descrição curta"></textarea>
+        <input type="text" id="gameUrl" placeholder="Link do Jogo (Embed/URL)">
         <button class="btn-main" onclick="saveGame()">Publicar</button>
     </div>
 
     <div class="poki-view" id="pokiPlayer">
         <div class="poki-toolbar">
             <div id="pokiTitle" style="font-weight: bold;">Nome do Jogo</div>
-            <div style="display: flex; gap: 20px;">
+            <div style="display: flex; gap: 20px; align-items: center;">
                 <button id="pokiLikeBtn" style="background:none; border:none; color:#ef4444; cursor:pointer; display:flex; align-items:center; gap:5px">
                     <i data-lucide="heart"></i> <span id="pokiLikeCount">0</span>
+                </button>
+                <button id="pokiDeleteBtn" class="btn-main btn-danger hidden" style="padding: 5px 10px; width: auto;">
+                    <i data-lucide="trash-2"></i> Apagar
                 </button>
                 <button onclick="closePoki()" style="background:none; border:none; color:white; cursor:pointer;">
                     <i data-lucide="x"></i>
@@ -201,42 +172,59 @@
     </div>
 
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('gh_user')) || null;
-        let games = JSON.parse(localStorage.getItem('gh_games')) || [];
+        const ADMIN_EMAIL = "contapropredro@gmail.com";
+        let users = JSON.parse(localStorage.getItem('gh_db_users')) || [];
+        let games = JSON.parse(localStorage.getItem('gh_db_games')) || [];
+        let currentUser = JSON.parse(sessionStorage.getItem('gh_session')) || null;
 
-        // Inicialização
         function init() {
             if(currentUser) {
-                document.getElementById('userName').innerText = currentUser.name;
+                document.getElementById('userName').innerText = currentUser.nick;
                 document.getElementById('userImg').src = currentUser.pic || 'https://api.dicebear.com/7.x/pixel-art/svg';
             }
             renderGames(games);
             lucide.createIcons();
         }
 
-        // Sistema de Perfil
-        function openProfileModal() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('profileModal').style.display = 'block';
+        // Sistema de Login/Registro
+        function openAuthModal() {
             if(currentUser) {
-                document.getElementById('regName').value = currentUser.name;
-                document.getElementById('regPic').value = currentUser.pic;
+                if(confirm("Deseja sair da conta?")) {
+                    sessionStorage.removeItem('gh_session');
+                    location.reload();
+                }
+                return;
             }
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('authModal').style.display = 'block';
         }
 
-        function saveProfile() {
-            const name = document.getElementById('regName').value;
-            const pic = document.getElementById('regPic').value;
-            if(!name) return alert("Digite um Nick!");
-            
-            currentUser = { name, pic };
-            localStorage.setItem('gh_user', JSON.stringify(currentUser));
+        function handleAuth() {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPass').value;
+            const nick = document.getElementById('authNick').value;
+            const pic = document.getElementById('authPic').value;
+
+            if(!email || !pass) return alert("E-mail e senha obrigatórios!");
+
+            let user = users.find(u => u.email === email);
+
+            if(user) {
+                if(user.pass !== pass) return alert("Senha incorreta!");
+            } else {
+                if(!nick) return alert("Para novas contas, preencha o Nickname!");
+                user = { email, pass, nick, pic };
+                users.push(user);
+                localStorage.setItem('gh_db_users', JSON.stringify(users));
+            }
+
+            sessionStorage.setItem('gh_session', JSON.stringify(user));
             location.reload();
         }
 
-        // Sistema de Postagem
+        // Postagem
         function openPostModal() {
-            if(!currentUser) return alert("Você precisa se registrar no perfil primeiro para postar!");
+            if(!currentUser) return alert("Faça login para postar jogos!");
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('postModal').style.display = 'block';
         }
@@ -245,26 +233,24 @@
             const title = document.getElementById('gameTitle').value;
             const pic = document.getElementById('gamePic').value;
             const url = document.getElementById('gameUrl').value;
-            const desc = document.getElementById('gameDesc').value;
 
-            if(!title || !url) return alert("Preencha Título e Link!");
+            if(!title || !url) return alert("Título e Link são obrigatórios!");
 
             const newGame = {
                 id: Date.now(),
                 title,
                 pic: pic || 'https://placehold.co/600x400/2e1065/white?text=Game',
                 url,
-                desc,
                 likes: 0,
-                likedBy: [] // Para controle de 1 like por pessoa
+                likedBy: [],
+                author: currentUser.email
             };
 
             games.unshift(newGame);
-            localStorage.setItem('gh_games', JSON.stringify(games));
+            localStorage.setItem('gh_db_games', JSON.stringify(games));
             location.reload();
         }
 
-        // Renderização e Pesquisa
         function renderGames(data) {
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = '';
@@ -274,7 +260,7 @@
                         <img src="${game.pic}" class="game-thumb">
                         <div class="game-info">
                             <div class="game-title">${game.title}</div>
-                            <div class="like-badge"><i data-lucide="heart" style="width:14px"></i> ${game.likes}</div>
+                            <div style="font-size:0.8rem; color:#64748b; margin-top:5px">Postado por: ${game.author === ADMIN_EMAIL ? 'Admin' : 'Usuário'}</div>
                         </div>
                     </div>
                 `;
@@ -282,16 +268,7 @@
             lucide.createIcons();
         }
 
-        function searchGames() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = games.filter(g => g.title.toLowerCase().includes(term));
-            
-            // Oculta o que não condiz
-            renderGames(filtered);
-            document.getElementById('sectionTitle').innerText = term ? `Resultados para: ${term}` : "Mais Recentes";
-        }
-
-        // Player de Jogo (Poki)
+        // Player e Permissões
         function openPoki(id) {
             const game = games.find(g => g.id === id);
             document.getElementById('pokiTitle').innerText = game.title;
@@ -299,37 +276,43 @@
             document.getElementById('pokiLikeCount').innerText = game.likes;
             document.getElementById('pokiPlayer').style.display = 'flex';
 
+            // Lógica do Like
             const likeBtn = document.getElementById('pokiLikeBtn');
-            
             likeBtn.onclick = () => {
-                if(!currentUser) return alert("Faça login para curtir!");
-                
-                // Verifica se o usuário já deu like neste jogo
-                if(game.likedBy.includes(currentUser.name)) {
-                    alert("Você já curtiu este jogo!");
-                    return;
-                }
-
-                game.likes += 1;
-                game.likedBy.push(currentUser.name);
+                if(!currentUser) return alert("Login necessário para curtir!");
+                if(game.likedBy.includes(currentUser.email)) return alert("Já curtiu!");
+                game.likes++;
+                game.likedBy.push(currentUser.email);
                 document.getElementById('pokiLikeCount').innerText = game.likes;
-                
-                // Salva no banco local
-                localStorage.setItem('gh_games', JSON.stringify(games));
+                localStorage.setItem('gh_db_games', JSON.stringify(games));
                 renderGames(games);
             };
+
+            // Lógica de Deletar (Autor ou Você no e-mail específico)
+            const delBtn = document.getElementById('pokiDeleteBtn');
+            if(currentUser && (currentUser.email === game.author || currentUser.email === ADMIN_EMAIL)) {
+                delBtn.classList.remove('hidden');
+                delBtn.onclick = () => {
+                    if(confirm("Tem certeza que deseja apagar este jogo permanentemente?")) {
+                        games = games.filter(g => g.id !== id);
+                        localStorage.setItem('gh_db_games', JSON.stringify(games));
+                        location.reload();
+                    }
+                };
+            } else {
+                delBtn.classList.add('hidden');
+            }
         }
 
-        function closePoki() {
-            document.getElementById('pokiPlayer').style.display = 'none';
-            document.getElementById('pokiIframe').src = '';
+        function searchGames() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = games.filter(g => g.title.toLowerCase().includes(term));
+            renderGames(filtered);
+            document.getElementById('sectionTitle').innerText = term ? `Buscando: ${term}` : "Mais Recentes";
         }
 
-        function closeModals() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('profileModal').style.display = 'none';
-            document.getElementById('postModal').style.display = 'none';
-        }
+        function closePoki() { document.getElementById('pokiPlayer').style.display = 'none'; document.getElementById('pokiIframe').src = ''; }
+        function closeModals() { document.getElementById('overlay').style.display = 'none'; document.querySelectorAll('.modal-box').forEach(m => m.style.display='none'); }
 
         init();
     </script>
