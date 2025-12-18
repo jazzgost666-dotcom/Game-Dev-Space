@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevCord | Discovery Edition</title>
+    <title>DevCord | Ultimate Fix</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
@@ -14,109 +14,97 @@
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'gg sans', sans-serif; background: var(--bg-chat); color: var(--text-main); overflow: hidden; }
         #app { display: flex; height: 100vh; }
 
-        /* SIDEBAR SERVIDORES */
+        /* SIDEBARS */
         .sidebar-servers { width: 72px; background: var(--bg-servers); display: flex; flex-direction: column; align-items: center; padding-top: 12px; gap: 8px; flex-shrink: 0; }
         .server-icon { width: 48px; height: 48px; background: var(--bg-chat); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background-size: cover; background-position: center; color: var(--success); }
-        .server-icon:hover, .server-icon.active { border-radius: 30%; background-color: var(--accent); color: white; }
+        .server-icon:hover { border-radius: 30%; background-color: var(--accent); color: white; }
 
-        /* SIDEBAR CANAIS */
         .sidebar-channels { width: 240px; background: var(--bg-channels); display: flex; flex-direction: column; flex-shrink: 0; }
-        .header-box { height: 48px; display: flex; align-items: center; padding: 0 16px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.2); gap: 10px; }
-        .side-section-title { padding: 18px 8px 4px 16px; font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
-        .nav-item { padding: 8px 12px; margin: 2px 8px; cursor: pointer; border-radius: 4px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .header-box-side { height: 48px; display: flex; align-items: center; padding: 0 16px; font-weight: bold; border-bottom: 1px solid rgba(0,0,0,0.2); box-shadow: 0 1px 2px rgba(0,0,0,0.1); gap: 10px; }
+        .nav-item { padding: 10px 12px; margin: 2px 8px; cursor: pointer; border-radius: 4px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; font-size: 14px; }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
 
-        /* CHAT */
+        /* CHAT AREA */
         .chat-area { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+        .chat-header { height: 48px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid rgba(0,0,0,0.2); font-weight: bold; }
         #msg-container { flex-grow: 1; overflow-y: auto; padding: 20px 0; }
+        
         .message-wrapper { padding: 8px 16px; display: flex; gap: 16px; position: relative; }
         .message-wrapper:hover { background: rgba(0,0,0,0.03); }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-color: var(--accent); flex-shrink: 0; cursor: pointer; }
-        .user-tag { color: white; font-size: 10px; background: var(--accent); padding: 1px 4px; border-radius: 3px; margin-left: 6px; font-weight: bold; vertical-align: middle; }
+        .msg-actions { position: absolute; right: 20px; top: 5px; display: none; background: var(--bg-input); border-radius: 4px; padding: 4px; gap: 8px; }
+        .message-wrapper:hover .msg-actions { display: flex; }
         
-        /* LUPA / DISCOVERY SCREEN */
-        .discovery-overlay { position: fixed; inset: 0; background: var(--bg-chat); z-index: 9999; display: none; flex-direction: column; }
-        .discovery-header { padding: 40px; text-align: center; background: #232428; }
-        .search-bar-big { width: 100%; max-width: 600px; padding: 15px; border-radius: 8px; border: none; background: var(--bg-servers); color: white; font-size: 18px; outline: none; }
-        .discovery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 40px; overflow-y: auto; }
-        .srv-card { background: var(--bg-servers); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; position: relative; }
-        .srv-card:hover { transform: translateY(-5px); }
-        .srv-card-banner { height: 100px; background: var(--accent); background-size: cover; }
-        .srv-card-icon { width: 60px; height: 60px; border-radius: 18px; border: 4px solid var(--bg-servers); margin: -30px 0 0 15px; background-size: cover; background-color: #444; position: relative; }
-        .srv-card-info { padding: 15px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-color: var(--accent); flex-shrink: 0; }
+        .user-tag { color: white; font-size: 10px; background: var(--accent); padding: 1px 5px; border-radius: 3px; margin-left: 8px; font-weight: 800; text-transform: uppercase; }
+        
+        /* RESPOSTA VISUAL */
+        .reply-bar { background: rgba(255,255,255,0.05); border-left: 3px solid var(--accent); padding: 4px 10px; font-size: 12px; margin-bottom: 4px; border-radius: 4px; color: var(--text-muted); }
 
-        /* INPUT AREA */
-        .input-section { padding: 0 16px 24px; }
-        .input-wrapper { background: var(--bg-input); border-radius: 8px; display: flex; align-items: center; padding: 4px 12px; gap: 12px; }
-        #message-input { flex-grow: 1; background: transparent; border: none; color: white; padding: 10px 0; outline: none; }
+        /* INPUT */
+        .input-section { padding: 0 16px 24px; position: relative; }
+        .reply-preview-box { background: var(--bg-servers); padding: 8px 16px; border-top-left-radius: 8px; border-top-right-radius: 8px; display: none; align-items: center; justify-content: space-between; font-size: 13px; }
+        .input-wrapper { background: var(--bg-input); border-radius: 0 0 8px 8px; display: flex; align-items: center; padding: 4px 12px; gap: 12px; }
+        .input-wrapper.no-reply { border-radius: 8px; }
+        #message-input { flex-grow: 1; background: transparent; border: none; color: white; padding: 12px 0; outline: none; }
         .icon-btn { cursor: pointer; color: var(--text-muted); }
         .icon-btn:hover { color: white; }
 
-        /* MODAIS */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 8000; }
-        .modal-card { background: var(--bg-chat); padding: 24px; border-radius: 8px; width: 400px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
-        .btn-blue { background: var(--accent); }
+        /* DISCOVERY */
+        .discovery-overlay { position: fixed; inset: 0; background: var(--bg-chat); z-index: 9999; display: none; flex-direction: column; }
+        .discovery-header { padding: 40px; background: #232428; display: flex; flex-direction: column; align-items: center; }
+        .discovery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; padding: 40px; overflow-y: auto; }
+        .srv-card { background: var(--bg-servers); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,255,255,0.05); }
+        .srv-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* AUDIO PLAYER FIX */
+        audio { height: 32px; filter: invert(0.9); margin-top: 8px; }
     </style>
 </head>
 <body>
 
     <div id="discovery-screen" class="discovery-overlay">
         <div class="discovery-header">
-            <h1 style="margin-bottom: 20px;">Encontre sua comunidade</h1>
-            <input type="text" id="discovery-search" class="search-bar-big" placeholder="Para onde você quer ir?" oninput="searchDiscovery()">
-            <button class="btn" onclick="closeDiscovery()" style="margin-left: 10px;">Voltar</button>
+            <h1>Descobrir Comunidades</h1>
+            <input type="text" id="disc-search" placeholder="Pesquisar servidores..." style="width:100%; max-width:500px; padding:12px; border-radius:8px; border:none; background:var(--bg-servers); color:white;">
+            <button class="btn btn-blue" style="margin-top:15px;" onclick="closeDisc()">Voltar ao Chat</button>
         </div>
-        <div class="discovery-grid" id="discovery-results"></div>
-    </div>
-
-    <div id="modal-profile" class="modal">
-        <div class="modal-card" style="padding:0; overflow:hidden;">
-            <div id="prof-banner" style="height:120px; background: var(--accent); background-size:cover;"></div>
-            <div style="padding:20px; position:relative;">
-                <div id="prof-avatar" style="width:80px; height:80px; border-radius:50%; border:6px solid var(--bg-chat); position:absolute; top:-40px; background-size:cover; background-color: #555;"></div>
-                <div style="margin-top:45px;">
-                    <h2 id="prof-nick" style="margin:0">Nick</h2>
-                    <input type="text" id="edit-nick" placeholder="Mudar Nick" style="width:100%; margin-top:10px; background:#1e1f22; border:none; padding:8px; color:white;">
-                    <input type="text" id="edit-tag" placeholder="Tag (Ex: ADM)" style="width:100%; margin-top:10px; background:#1e1f22; border:none; padding:8px; color:white;">
-                    <button class="btn btn-blue" style="width:100%; margin-top:15px;" onclick="saveProfile()">Salvar Tudo</button>
-                </div>
-            </div>
-            <button class="btn" style="width:100%; border-radius:0;" onclick="closeModal('modal-profile')">Fechar</button>
-        </div>
+        <div class="discovery-grid" id="disc-results"></div>
     </div>
 
     <div id="app">
         <nav class="sidebar-servers">
             <div class="server-icon" onclick="switchMode('DM', null, 'Início')"><i class="material-icons">forum</i></div>
             <div style="width:32px; height:2px; background:#35363c; margin:4px 0"></div>
-            <div id="srv-list"></div>
-            <div class="server-icon" style="color:var(--success)" onclick="openModal('modal-create')"><i class="material-icons">add</i></div>
-            <div class="server-icon" onclick="openDiscovery()"><i class="material-icons">explore</i></div>
+            <div id="srv-list-container"></div>
+            <div class="server-icon" style="color:var(--success)" onclick="openCreateSrv()"><i class="material-icons">add</i></div>
+            <div class="server-icon" onclick="openDisc()"><i class="material-icons">explore</i></div>
         </nav>
 
         <aside class="sidebar-channels">
-            <div class="header-box">
-                <span id="side-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DevCord</span>
-                <i class="material-icons icon-btn" id="gear-btn" style="display:none" onclick="openSettings()">settings</i>
+            <div class="header-box-side">
+                <span id="side-srv-title">Início</span>
+                <i class="material-icons icon-btn" id="srv-gear" style="display:none" onclick="openSrvSettings()">settings</i>
             </div>
-            <div id="sidebar-content" style="overflow-y: auto; flex-grow:1;">
-                </div>
-            <div style="padding:10px; background:#232428; display:flex; align-items:center; gap:10px; cursor:pointer" onclick="viewProfile()">
+            <div id="sidebar-dynamic-content" style="flex-grow:1; overflow-y:auto;"></div>
+            <div style="padding:10px; background:#232428; display:flex; align-items:center; gap:10px; cursor:pointer" onclick="openProfile()">
                 <div id="ui-avatar" style="width:32px; height:32px; border-radius:50%; background-size:cover; background-color:var(--accent)"></div>
-                <div id="ui-nick" style="font-size:13px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;">...</div>
+                <div id="ui-nick" style="font-size:13px; font-weight:bold">...</div>
             </div>
         </aside>
 
         <main class="chat-area">
-            <div class="header-box"><i class="material-icons" style="font-size:20px; color:var(--text-muted)">tag</i> <span id="chat-title">chat</span></div>
+            <div class="chat-header"># <span id="chat-chan-title">geral</span></div>
             <div id="msg-container"></div>
             <div class="input-section">
-                <div class="input-wrapper">
-                    <i class="material-icons icon-btn" onclick="document.getElementById('up-chat').click()">add_circle</i>
-                    <input type="file" id="up-chat" hidden onchange="uploadToChat(this)">
+                <div id="reply-preview" class="reply-preview-box">
+                    <span id="reply-text-info">Replying...</span>
+                    <i class="material-icons icon-btn" style="font-size:18px" onclick="cancelReply()">close</i>
+                </div>
+                <div class="input-wrapper no-reply" id="input-wrap-main">
+                    <i class="material-icons icon-btn" onclick="document.getElementById('file-up').click()">add_circle</i>
+                    <input type="file" id="file-up" hidden onchange="uploadImage(this)">
                     <input type="text" id="message-input" placeholder="Conversar...">
-                    <i class="material-icons icon-btn" id="mic-btn" onclick="handleMic()">mic</i>
+                    <i class="material-icons icon-btn" id="mic-btn" onclick="toggleMic()">mic</i>
                 </div>
             </div>
         </main>
@@ -141,169 +129,166 @@
     const auth = getAuth(app);
 
     let currentMode = "DM", currentSrvId = null, currentChanId = "geral", unsubChat = null;
-    let mediaRecorder, chunks = [];
+    let replyData = null, mediaRecorder, audioChunks = [];
 
-    onAuthStateChanged(auth, async (u) => {
-        if(u) {
-            const userRef = doc(db, "usuarios", u.uid);
-            const snap = await getDoc(userRef);
-            if(!snap.exists()) await setDoc(userRef, { nick: u.email.split('@')[0], avatar: '', banner: '', tag: 'Membro' });
-            initApp();
-        }
-    });
+    onAuthStateChanged(auth, u => { if(u) startSystem(); });
 
-    // --- LUPA (DISCOVERY) ---
-    window.openDiscovery = () => document.getElementById('discovery-screen').style.display = 'flex';
-    window.closeDiscovery = () => document.getElementById('discovery-screen').style.display = 'none';
-
-    window.searchDiscovery = async () => {
-        const val = document.getElementById('discovery-search').value.toLowerCase();
-        const results = document.getElementById('discovery-results');
-        results.innerHTML = '';
-        const q = await getDocs(collection(db, "todos_servidores"));
-        
-        q.forEach(d => {
-            const s = d.data();
-            if(s.nome.toLowerCase().includes(val)) {
-                const card = document.createElement('div');
-                card.className = 'srv-card';
-                card.innerHTML = `
-                    <div class="srv-card-banner" style="background-image:url(${s.banner || ''})"></div>
-                    <div class="srv-card-icon" style="background-image:url(${s.foto || ''})"></div>
-                    <div class="srv-card-info">
-                        <h3>${s.nome}</h3>
-                        <button class="btn btn-blue" style="width:100%; margin-top:10px" onclick="joinServer('${d.id}')">Entrar</button>
-                    </div>`;
-                results.appendChild(card);
-            }
-        });
-    };
-
-    window.joinServer = async (sid) => {
-        await setDoc(doc(db, "membros", `${auth.currentUser.uid}_${sid}`), { uid: auth.currentUser.uid, srvId: sid });
-        closeDiscovery();
-    };
-
-    // --- CHAT E MÍDIA ---
-    async function send(text = '', img = null, audio = null) {
-        const u = (await getDoc(doc(db, "usuarios", auth.currentUser.uid))).data();
-        const path = currentMode === 'DM' ? 'msgs_global_dm' : `msgs_${currentSrvId}_${currentChanId}`;
-        await addDoc(collection(db, path), {
-            text, image: img, audio, user: u.nick, tag: u.tag, avatar: u.avatar, uid: auth.currentUser.uid, createdAt: serverTimestamp()
-        });
-    }
-
-    window.uploadToChat = i => {
-        const f = i.files[0]; if(f){ const r = new FileReader(); r.onload = e => send('', e.target.result); r.readAsDataURL(f); }
-    };
-
-    window.handleMic = async () => {
+    // --- AUDIO FIX ---
+    window.toggleMic = async () => {
         const btn = document.getElementById('mic-btn');
         if(!mediaRecorder || mediaRecorder.state === 'inactive') {
-            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(s); chunks = [];
-            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
             mediaRecorder.onstop = () => {
-                const r = new FileReader(); r.readAsDataURL(new Blob(chunks));
-                r.onloadend = () => send('', null, r.result);
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => sendMsg('', null, reader.result);
             };
-            mediaRecorder.start(); btn.style.color = 'red';
+            mediaRecorder.start(); btn.style.color = 'var(--danger)';
         } else { mediaRecorder.stop(); btn.style.color = 'inherit'; }
     };
 
-    // --- AMIZADES ---
-    function renderFriendsUI() {
-        const sidebar = document.getElementById('sidebar-content');
-        sidebar.innerHTML = `
-            <div class="nav-item" onclick="addFriendPrompt()"><i class="material-icons">person_add</i> Adicionar Amigo</div>
-            <div class="side-section-title">Amigos</div>
-            <div id="list-friends"></div>
-            <div class="side-section-title">Pedidos de Amizade</div>
-            <div id="list-requests"></div>
-        `;
-        // Exemplo visual (Para integrar real precisaria de uma collection 'amizades')
-        document.getElementById('list-requests').innerHTML = `
-            <div class="nav-item" style="justify-content:space-between">
-                <span>Arthur</span>
-                <div><i class="material-icons" style="color:var(--success)">check</i> <i class="material-icons" style="color:var(--danger)">close</i></div>
-            </div>`;
+    // --- CHAT LOGIC ---
+    async function sendMsg(text = '', img = null, audio = null) {
+        const u = (await getDoc(doc(db, "usuarios", auth.currentUser.uid))).data();
+        const path = currentMode === 'DM' ? 'msgs_dm_global' : `msgs_${currentSrvId}_${currentChanId}`;
+        await addDoc(collection(db, path), {
+            text, image: img, audio, reply: replyData,
+            user: u.nick, tag: u.tag || '', avatar: u.avatar || '', uid: auth.currentUser.uid,
+            createdAt: serverTimestamp()
+        });
+        cancelReply();
     }
 
-    // --- SISTEMA ---
+    window.replyTo = (user, content) => {
+        replyData = { user, text: content.substring(0, 40) };
+        document.getElementById('reply-preview').style.display = 'flex';
+        document.getElementById('reply-text-info').innerText = `Respondendo a ${user}`;
+        document.getElementById('input-wrap-main').classList.remove('no-reply');
+    };
+
+    window.cancelReply = () => {
+        replyData = null;
+        document.getElementById('reply-preview').style.display = 'none';
+        document.getElementById('input-wrap-main').classList.add('no-reply');
+    };
+
+    // --- DMs & FRIENDS ---
+    function renderDMHome() {
+        const cont = document.getElementById('sidebar-dynamic-content');
+        cont.innerHTML = `
+            <div class="nav-item" onclick="alert('Funcionalidade de pedido enviada!')"><i class="material-icons">person_add</i> Adicionar Amigo</div>
+            <div style="padding:16px 16px 4px; font-size:12px; font-weight:bold; color:var(--text-muted)">PEDIDOS PENDENTES</div>
+            <div id="friend-requests-list">
+                <div class="nav-item" style="justify-content:space-between">
+                    <span>Arthur_Dev</span>
+                    <div style="display:flex; gap:5px">
+                        <i class="material-icons" style="color:var(--success); font-size:20px">check</i>
+                        <i class="material-icons" style="color:var(--danger); font-size:20px">close</i>
+                    </div>
+                </div>
+            </div>
+            <div style="padding:16px 16px 4px; font-size:12px; font-weight:bold; color:var(--text-muted)">AMIGOS</div>
+            <div class="nav-item"><div style="width:30px; height:30px; border-radius:50%; background:#555"></div> Exiled Gostoso</div>
+        `;
+        loadChat();
+    }
+
+    // --- CORE ---
+    function startSystem() {
+        onSnapshot(query(collection(db, "membros"), where("uid", "==", auth.currentUser.uid)), async snap => {
+            const list = document.getElementById('srv-list-container'); list.innerHTML = '';
+            for(const d of snap.docs) {
+                const s = (await getDoc(doc(db, "todos_servidores", d.data().srvId))).data();
+                if(s) {
+                    const el = document.createElement('div'); el.className = 'server-icon';
+                    if(s.foto) el.style.backgroundImage = `url(${s.foto})`; else el.innerText = s.nome[0];
+                    el.onclick = () => switchMode('SERVER', d.data().srvId, s.nome);
+                    list.appendChild(el);
+                }
+            }
+        });
+        switchMode('DM', null, 'Início');
+    }
+
     window.switchMode = (mode, id, nome) => {
         currentMode = mode; currentSrvId = id;
-        document.getElementById('side-title').innerText = nome;
-        if(mode === 'DM') renderFriendsUI();
-        else listenChannels(id);
-        loadChat();
+        document.getElementById('side-srv-title').innerText = nome;
+        document.getElementById('srv-gear').style.display = (mode === 'SERVER') ? 'block' : 'none';
+        if(mode === 'DM') renderDMHome(); else loadChannels(id);
     };
+
+    function loadChannels(sid) {
+        onSnapshot(collection(db, `canais_${sid}`), snap => {
+            const cont = document.getElementById('sidebar-dynamic-content');
+            cont.innerHTML = '<div style="padding:16px 16px 4px; font-size:12px; font-weight:bold; color:var(--text-muted)">CANAIS DE TEXTO</div>';
+            snap.forEach(d => {
+                cont.innerHTML += `<div class="nav-item" onclick="selectChan('${d.id}', '${d.data().nome}')"># ${d.data().nome}</div>`;
+            });
+            cont.innerHTML += `<div class="nav-item" style="color:var(--success)" onclick="createChan()"><i class="material-icons">add</i> Criar Canal</div>`;
+        });
+        loadChat();
+    }
+
+    window.selectChan = (id, nome) => { currentChanId = id; document.getElementById('chat-chan-title').innerText = nome; loadChat(); };
 
     function loadChat() {
         if(unsubChat) unsubChat();
-        const path = currentMode === 'DM' ? 'msgs_global_dm' : `msgs_${currentSrvId}_${currentChanId}`;
+        const path = currentMode === 'DM' ? 'msgs_dm_global' : `msgs_${currentSrvId}_${currentChanId}`;
         unsubChat = onSnapshot(query(collection(db, path), orderBy("createdAt", "asc")), snap => {
             const cont = document.getElementById('msg-container'); cont.innerHTML = '';
             snap.forEach(d => {
                 const m = d.data();
-                cont.innerHTML += `
-                    <div class="message-wrapper">
-                        <div class="avatar" style="background-image:url(${m.avatar})"></div>
-                        <div>
-                            <span style="font-weight:bold; cursor:pointer" onclick="viewProfile('${m.uid}')">${m.user}</span>
-                            ${m.tag ? `<span class="user-tag">${m.tag}</span>` : ''}
-                            <div style="margin-top:2px">
-                                ${m.text ? `<div>${m.text}</div>` : ''}
-                                ${m.image ? `<img src="${m.image}" style="max-width:300px; border-radius:8px; margin-top:5px">` : ''}
-                                ${m.audio ? `<audio controls src="${m.audio}" style="height:30px; filter:invert(0.8)"></audio>` : ''}
-                            </div>
+                const div = document.createElement('div'); div.className = 'message-wrapper';
+                div.innerHTML = `
+                    <div class="avatar" style="background-image:url(${m.avatar})"></div>
+                    <div style="width:100%">
+                        ${m.reply ? `<div class="reply-bar">Respondendo a <b>${m.reply.user}</b>: ${m.reply.text}</div>` : ''}
+                        <span style="font-weight:bold">${m.user}</span> ${m.tag ? `<span class="user-tag">${m.tag}</span>` : ''}
+                        <div style="margin-top:2px">
+                            ${m.text ? `<div>${m.text}</div>` : ''}
+                            ${m.image ? `<img src="${m.image}" style="max-width:400px; border-radius:8px; display:block; margin-top:5px">` : ''}
+                            ${m.audio ? `<audio controls src="${m.audio}"></audio>` : ''}
                         </div>
+                    </div>
+                    <div class="msg-actions">
+                        <i class="material-icons icon-btn" onclick="replyTo('${m.user}', '${m.text || 'Mídia'}')">reply</i>
+                        ${m.uid === auth.currentUser.uid ? `<i class="material-icons icon-btn" style="color:var(--danger)" onclick="deleteMsg('${d.id}')">delete</i>` : ''}
                     </div>`;
+                cont.appendChild(div);
             });
             cont.scrollTop = cont.scrollHeight;
         });
     }
 
-    function initApp() {
-        onSnapshot(query(collection(db, "membros"), where("uid", "==", auth.currentUser.uid)), async snap => {
-            const list = document.getElementById('srv-list'); list.innerHTML = '';
-            for(const d of snap.docs) {
-                const s = (await getDoc(doc(db, "todos_servidores", d.data().srvId))).data();
-                if(s){
-                    const div = document.createElement('div'); div.className = 'server-icon';
-                    if(s.foto) div.style.backgroundImage = `url(${s.foto})`; else div.innerText = s.nome[0];
-                    div.onclick = () => switchMode('SERVER', d.data().srvId, s.nome);
-                    list.appendChild(div);
-                }
-            }
-        });
-        getDoc(doc(db, "usuarios", auth.currentUser.uid)).then(s => {
-            document.getElementById('ui-nick').innerText = s.data().nick;
-            document.getElementById('ui-avatar').style.backgroundImage = `url(${s.data().avatar})`;
-        });
-        switchMode('DM', null, 'Mensagens Diretas');
-    }
-
-    function listenChannels(sid) {
-        onSnapshot(collection(db, `canais_${sid}`), snap => {
-            const cont = document.getElementById('sidebar-content'); cont.innerHTML = '<div class="side-section-title">Canais de Texto</div>';
-            snap.forEach(d => {
-                cont.innerHTML += `<div class="nav-item" onclick="selectChan('${d.id}')"><i class="material-icons" style="font-size:18px">tag</i> ${d.data().nome}</div>`;
-            });
-        });
-    }
-
-    window.saveProfile = async () => {
-        await setDoc(doc(db, "usuarios", auth.currentUser.uid), {
-            nick: document.getElementById('edit-nick').value,
-            tag: document.getElementById('edit-tag').value
-        }, {merge:true});
-        location.reload();
+    window.openDisc = () => {
+        document.getElementById('discovery-screen').style.display = 'flex';
+        renderDiscovery();
     };
+    window.closeDisc = () => document.getElementById('discovery-screen').style.display = 'none';
 
-    window.openModal = id => document.getElementById(id).style.display = 'flex';
-    window.closeModal = id => document.getElementById(id).style.display = 'none';
-    window.selectChan = id => { currentChanId = id; loadChat(); };
-    document.getElementById('message-input').onkeypress = e => { if(e.key === 'Enter' && e.target.value.trim()){ send(e.target.value); e.target.value = ''; } };
+    async function renderDiscovery() {
+        const q = await getDocs(collection(db, "todos_servidores"));
+        const cont = document.getElementById('disc-results'); cont.innerHTML = '';
+        q.forEach(d => {
+            const s = d.data();
+            cont.innerHTML += `
+                <div class="srv-card" onclick="joinServer('${d.id}')">
+                    <div style="height:100px; background:url(${s.banner || ''}) var(--accent) center/cover"></div>
+                    <div style="padding:15px; display:flex; gap:12px; align-items:center">
+                        <div style="width:40px; height:40px; border-radius:10px; background:url(${s.foto}) center/cover"></div>
+                        <b>${s.nome}</b>
+                    </div>
+                </div>`;
+        });
+    }
+
+    window.joinServer = async sid => { await setDoc(doc(db, "membros", `${auth.currentUser.uid}_${sid}`), { uid: auth.currentUser.uid, srvId: sid }); closeDisc(); };
+    window.uploadImage = i => { const f = i.files[0]; if(f){ const r = new FileReader(); r.onload = e => sendMsg('', e.target.result); r.readAsDataURL(f); } };
+    document.getElementById('message-input').onkeypress = e => { if(e.key === 'Enter' && e.target.value.trim()){ sendMsg(e.target.value); e.target.value = ''; } };
 </script>
 </body>
 </html>
