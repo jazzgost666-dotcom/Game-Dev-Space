@@ -6,7 +6,6 @@
     <title>GAMEHUB | Cloud</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -56,6 +55,7 @@
         .nav-right { display: flex; gap: 15px; align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-main:hover { box-shadow: var(--glow); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 
         .user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 5px 12px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #1e293b; }
@@ -81,7 +81,19 @@
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; backdrop-filter: blur(5px); }
         .modal-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111827; padding: 40px; border-radius: 12px; z-index: 2001; width: 90%; max-width: 420px; display: none; border: 1px solid var(--accent); }
-        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; border: 1px solid #1f2937; background: #030712; color: white; box-sizing: border-box; }
+        input, textarea, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 6px; border: 1px solid #1f2937; background: #030712; color: white; box-sizing: border-box; }
+        
+        /* Estilo para upload de arquivo */
+        .file-upload-label {
+            display: block; padding: 14px; margin: 10px 0;
+            border: 2px dashed #1f2937; border-radius: 6px;
+            text-align: center; cursor: pointer; color: #94a3b8; transition: 0.3s;
+        }
+        .file-upload-label:hover { border-color: var(--accent); color: white; }
+        input[type="file"] { display: none; }
+
+        .tab-btn { padding: 5px 10px; cursor: pointer; font-size: 0.8rem; opacity: 0.6; }
+        .tab-btn.active { opacity: 1; border-bottom: 2px solid var(--accent); color: var(--accent); }
     </style>
 </head>
 <body>
@@ -99,6 +111,7 @@
                 <img src="https://api.dicebear.com/7.x/identicon/svg?seed=user" id="navAvatar" class="user-avatar">
                 <span id="navUser">ENTRAR</span>
             </div>
+            <button class="btn-main" onclick="logout()" style="background: #1e293b; padding: 5px 10px; font-size: 0.8rem;">SAIR</button>
         </div>
     </header>
 
@@ -136,22 +149,52 @@
     </div>
 
     <div class="modal-overlay" id="modalOverlay" onclick="closeModals()"></div>
+    
     <div class="modal-box" id="authModal">
         <h2 style="margin-top:0">PERFIL</h2>
-        <input type="email" id="emailIn" placeholder="E-MAIL">
-        <input type="password" id="passIn" placeholder="SENHA">
+        <input type="email" id="emailIn" placeholder="E-MAIL (Login)">
         <input type="text" id="nickIn" placeholder="NICKNAME">
-        <input type="text" id="picIn" placeholder="URL DA FOTO">
-        <button class="btn-main" style="width:100%" onclick="handleAuth()">SALVAR</button>
+        
+        <div style="margin-top: 10px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">FOTO DE PERFIL:</label>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <label for="picUpload" class="file-upload-label" style="flex:1; margin:0;">📁 UPLOAD PC</label>
+                <input type="file" id="picUpload" accept="image/*" onchange="previewFile('picUpload', 'picPreview')">
+            </div>
+            <input type="text" id="picUrlIn" placeholder="OU COLE URL DA FOTO">
+            <img id="picPreview" src="" style="width: 50px; height: 50px; border-radius: 50%; display: none; margin-top: 10px; object-fit: cover; border: 2px solid var(--accent);">
+        </div>
+
+        <button class="btn-main" style="width:100%; margin-top: 20px;" onclick="handleAuth()">SALVAR / ENTRAR</button>
     </div>
 
     <div class="modal-box" id="postModal">
         <h2 style="margin-top:0">NOVO JOGO</h2>
-        <input type="text" id="postTitle" placeholder="TITULO">
-        <input type="text" id="postPic" placeholder="URL DA CAPA">
-        <input type="text" id="postUrl" placeholder="URL DO JOGO">
+        <input type="text" id="postTitle" placeholder="TITULO DO JOGO">
+        <input type="text" id="postPic" placeholder="URL DA CAPA (IMAGEM)">
+        
+        <div style="margin: 15px 0;">
+            <div style="display: flex; gap: 15px; margin-bottom: 10px; border-bottom: 1px solid #333;">
+                <span class="tab-btn active" id="tabLink" onclick="switchTab('link')">USAR LINK</span>
+                <span class="tab-btn" id="tabUpload" onclick="switchTab('upload')">UPLOAD HTML</span>
+            </div>
+            
+            <div id="methodLink">
+                <input type="text" id="postUrl" placeholder="URL DO JOGO (Ex: itch.io embed)">
+            </div>
+            
+            <div id="methodUpload" style="display: none;">
+                <label for="gameUpload" class="file-upload-label">
+                    <i data-lucide="upload-cloud"></i> SELECIONAR ARQUIVO .HTML
+                </label>
+                <input type="file" id="gameUpload" accept=".html,.htm">
+                <small style="color: #ef4444; font-size: 0.7rem;">⚠️ MÁX 1MB (Limite do Firestore)</small>
+                <div id="fileNameDisplay" style="font-size: 0.8rem; color: var(--accent); margin-top: 5px;"></div>
+            </div>
+        </div>
+
         <textarea id="postDesc" placeholder="DESCRICAO" rows="4"></textarea>
-        <button class="btn-main" style="width:100%" onclick="saveGame()">PUBLICAR</button>
+        <button class="btn-main" style="width:100%" onclick="saveGame()">PUBLICAR JOGO</button>
     </div>
 
     <script>
@@ -168,18 +211,25 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const ADMIN = "contapropredro@gmail.com";
-        let currentUser = JSON.parse(sessionStorage.getItem('gh_sess')) || null;
+        
+        // MUDANÇA: USANDO LOCALSTORAGE PARA PERSISTÊNCIA
+        let currentUser = JSON.parse(localStorage.getItem('gh_sess')) || null;
+        let postMethod = 'link'; // 'link' or 'upload'
 
         function init() {
             if(currentUser) {
-                document.getElementById('navUser').innerText = currentUser.nick.toUpperCase();
-                if(currentUser.pic) document.getElementById('navAvatar').src = currentUser.pic;
+                updateNavUser();
             }
             db.collection("games").orderBy("createdAt", "desc").onSnapshot(snapshot => {
                 const gamesList = [];
                 snapshot.forEach(doc => gamesList.push({ id: doc.id, ...doc.data() }));
                 render(gamesList);
             });
+        }
+
+        function updateNavUser() {
+            document.getElementById('navUser').innerText = currentUser.nick.toUpperCase();
+            if(currentUser.pic) document.getElementById('navAvatar').src = currentUser.pic;
         }
 
         function render(list) {
@@ -205,18 +255,111 @@
             `;
         }
 
+        // FUNÇÃO PARA CONVERTER ARQUIVO EM BASE64
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        // TROCA ENTRE LINK E UPLOAD
+        function switchTab(mode) {
+            postMethod = mode;
+            document.getElementById('tabLink').classList.toggle('active', mode === 'link');
+            document.getElementById('tabUpload').classList.toggle('active', mode === 'upload');
+            document.getElementById('methodLink').style.display = mode === 'link' ? 'block' : 'none';
+            document.getElementById('methodUpload').style.display = mode === 'upload' ? 'block' : 'none';
+        }
+
+        document.getElementById('gameUpload').addEventListener('change', function(){
+            if(this.files[0]) document.getElementById('fileNameDisplay').innerText = "Selecionado: " + this.files[0].name;
+        });
+
         async function saveGame() {
             if(!currentUser) return alert("FACA LOGIN");
             const title = document.getElementById('postTitle').value;
             const pic = document.getElementById('postPic').value;
-            const url = document.getElementById('postUrl').value;
             const desc = document.getElementById('postDesc').value;
-            if(!title || !url) return alert("DADOS FALTANDO");
-            await db.collection("games").add({
-                title, pic, url, desc, likes: 0, likedBy: [],
-                author: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            
+            let finalUrl = "";
+
+            try {
+                if (postMethod === 'link') {
+                    finalUrl = document.getElementById('postUrl').value;
+                    if(!finalUrl) return alert("COLOQUE O LINK");
+                } else {
+                    const fileInput = document.getElementById('gameUpload');
+                    if(fileInput.files.length === 0) return alert("SELECIONE UM ARQUIVO");
+                    const file = fileInput.files[0];
+                    if(file.size > 1000000) return alert("ARQUIVO MUITO GRANDE (Max 1MB)"); // Limite do Firestore
+                    finalUrl = await toBase64(file);
+                }
+
+                if(!title) return alert("TITULO FALTANDO");
+                
+                // Salvando no Firestore
+                await db.collection("games").add({
+                    title, pic, url: finalUrl, desc, likes: 0, likedBy: [],
+                    author: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeModals();
+                alert("JOGO PUBLICADO!");
+                
+            } catch (error) {
+                console.error(error);
+                alert("ERRO AO SALVAR (Arquivo muito grande?)");
+            }
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('emailIn').value;
+            const nick = document.getElementById('nickIn').value;
+            const picUrl = document.getElementById('picUrlIn').value;
+            const picFile = document.getElementById('picUpload').files[0];
+
+            if(!email) return alert("E-MAIL REQUERIDO");
+
+            let finalAvatar = picUrl;
+
+            // Se o usuário fez upload de imagem, converte para Base64
+            if(picFile) {
+                if(picFile.size > 500000) return alert("IMAGEM DE PERFIL MUITO GRANDE (Max 500kb)");
+                finalAvatar = await toBase64(picFile);
+            }
+
+            // Se não tem nick novo e já existe user, mantem o antigo
+            const finalNick = nick || (currentUser ? currentUser.nick : "PLAYER");
+            
+            currentUser = { 
+                email, 
+                nick: finalNick, 
+                pic: finalAvatar || (currentUser ? currentUser.pic : "") 
+            };
+            
+            // SALVA NO LOCALSTORAGE (PERSISTE APOS SAIR)
+            localStorage.setItem('gh_sess', JSON.stringify(currentUser));
+            updateNavUser();
             closeModals();
+        }
+
+        function logout() {
+            localStorage.removeItem('gh_sess');
+            location.reload();
+        }
+
+        function previewFile(inputId, imgId) {
+            const file = document.getElementById(inputId).files[0];
+            const preview = document.getElementById(imgId);
+            if(file){
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
         async function openGame(id) {
@@ -226,11 +369,15 @@
             document.getElementById('pgTitle').innerText = g.title;
             document.getElementById('descTitle').innerText = g.title;
             document.getElementById('descText').innerText = g.desc || "SEM DESCRICAO.";
+            
+            // A magica acontece aqui: o src do iframe aceita Base64
             document.getElementById('gameIframe').src = g.url;
+            
             document.getElementById('likeCount').innerText = g.likes || 0;
             if(currentUser && g.likedBy?.includes(currentUser.email)) likeBtn.classList.add('liked');
             else likeBtn.classList.remove('liked');
             document.getElementById('gamePage').style.display = 'flex';
+            
             likeBtn.onclick = async () => {
                 if(!currentUser) return alert("FACA LOGIN");
                 const freshDoc = await db.collection("games").doc(id).get();
@@ -240,7 +387,9 @@
                     likedBy: firebase.firestore.FieldValue.arrayUnion(currentUser.email)
                 });
                 likeBtn.classList.add('liked');
+                document.getElementById('likeCount').innerText = (g.likes || 0) + 1;
             };
+
             const delBtn = document.getElementById('btnDelete');
             if(currentUser && (currentUser.email === g.author || currentUser.email === ADMIN)) {
                 delBtn.style.display = 'block';
@@ -248,16 +397,6 @@
                     if(confirm("APAGAR?")) { await db.collection("games").doc(id).delete(); closeGame(); }
                 };
             } else delBtn.style.display = 'none';
-        }
-
-        function handleAuth() {
-            const email = document.getElementById('emailIn').value;
-            const nick = document.getElementById('nickIn').value;
-            const pic = document.getElementById('picIn').value;
-            if(!email) return alert("E-MAIL REQUERIDO");
-            currentUser = { email, nick: nick || "PLAYER", pic: pic || "" };
-            sessionStorage.setItem('gh_sess', JSON.stringify(currentUser));
-            location.reload();
         }
 
         function searchGames() {
