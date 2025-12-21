@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -79,7 +78,7 @@
         .modal-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111827; padding: 30px; border-radius: 12px; z-index: 2001; width: 90%; max-width: 450px; display: none; border: 1px solid var(--accent); overflow-y: auto; max-height: 90vh; }
         
         input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #1f2937; background: #030712; color: white; box-sizing: border-box; }
-        .file-upload-label { display: block; padding: 12px; margin: 8px 0; border: 2px dashed #1f2937; border-radius: 6px; text-align: center; cursor: pointer; color: #94a3b8; transition: 0.3s; font-size: 0.8rem; }
+        .file-upload-label { display: block; padding: 12px; margin: 8px 0; border: 2px dashed #1f2937; border-radius: 6px; text-align: center; cursor: pointer; color: #94a3b8; font-size: 0.8rem; }
         .tab-btn { padding: 5px 10px; cursor: pointer; font-size: 0.8rem; opacity: 0.6; }
         .tab-btn.active { opacity: 1; border-bottom: 2px solid var(--accent); color: var(--accent); }
     </style>
@@ -91,7 +90,7 @@
     <header>
         <div style="font-weight: 900; color: var(--accent); font-size: 1.6rem;">GAMEHUB</div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="PESQUISAR JOGO...">
+            <input type="text" id="searchInput" placeholder="PESQUISAR..." oninput="handleSearch()">
         </div>
         <div class="nav-right">
             <button class="btn-main" onclick="openModal('postModal')">POSTAR</button>
@@ -121,18 +120,19 @@
     <div class="modal-overlay" id="modalOverlay" onclick="closeModals()"></div>
     <div class="modal-box" id="postModal">
         <h2>NOVO JOGO</h2>
-        <input type="text" id="postTitle" placeholder="TITULO">
+        <input type="text" id="postTitle" placeholder="TITULO DO JOGO">
         <input type="text" id="postPic" placeholder="URL DA CAPA">
         
         <div style="display: flex; gap: 15px; border-bottom: 1px solid #333; margin-bottom: 10px;">
             <span class="tab-btn active" id="tabLink" onclick="switchTab('link')">LINK</span>
-            <span class="tab-btn" id="tabUpload" onclick="switchTab('upload')">UPLOAD (.ZIP)</span>
+            <span class="tab-btn" id="tabUpload" onclick="switchTab('upload')">UPLOAD HTML</span>
         </div>
 
         <div id="methodLink"><input type="text" id="postUrl" placeholder="URL DO JOGO"></div>
         <div id="methodUpload" style="display: none;">
-            <label class="file-upload-label" for="zipInput">SELECIONE O ARQUIVO .ZIP</label>
-            <input type="file" id="zipInput" accept=".zip" style="display:none">
+            <label class="file-upload-label" for="gameUpload">SELECIONAR ARQUIVO .HTML</label>
+            <input type="file" id="gameUpload" accept=".html" style="display:none">
+            <div id="fileName" style="font-size:0.7rem; color:var(--accent); text-align:center;"></div>
         </div>
 
         <textarea id="postDesc" placeholder="DESCRICAO"></textarea>
@@ -147,6 +147,7 @@
     </div>
 
     <script>
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyAMHAKVot044psR421B_t-Ht5EmsueVS8A",
             authDomain: "game-dev-space.firebaseapp.com",
@@ -161,6 +162,7 @@
         let currentUser = JSON.parse(localStorage.getItem('gh_sess'));
         let postMethod = 'link';
         let allGames = [];
+        let currentBlobUrl = null;
 
         function init() {
             if(currentUser) {
@@ -177,17 +179,23 @@
         function render(list) {
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = list.map(g => `
-                <div class="game-card" onclick="playGame('${g.id}')">
-                    <img src="${g.pic}" class="game-thumb">
+                <div class="game-card" onclick="openGame('${g.id}')">
+                    <img src="${g.pic || 'https://placehold.co/600x350/111827/8b5cf6?text=SEM+CAPA'}" class="game-thumb">
                     <div class="game-info"><strong>${g.title}</strong></div>
                 </div>
             `).join('');
         }
 
-        // PESQUISA CORRIGIDA
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const t = e.target.value.toLowerCase();
-            render(allGames.filter(g => g.title.toLowerCase().includes(t)));
+        // CONSERTO DA PESQUISA
+        function handleSearch() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allGames.filter(g => g.title.toLowerCase().includes(term));
+            render(filtered);
+        }
+
+        // CONSERTO DO UPLOAD
+        document.getElementById('gameUpload').addEventListener('change', function(e) {
+            if(this.files[0]) document.getElementById('fileName').innerText = this.files[0].name;
         });
 
         async function saveGame() {
@@ -200,23 +208,26 @@
             if(postMethod === 'link') {
                 finalData = document.getElementById('postUrl').value;
             } else {
-                const file = document.getElementById('zipInput').files[0];
-                if(!file) return alert("ZIP FALTANDO");
+                const file = document.getElementById('gameUpload').files[0];
+                if(!file) return alert("SELECIONE O ARQUIVO");
+                // Converte HTML em String Segura
                 finalData = await new Promise(r => {
                     const reader = new FileReader();
                     reader.onload = e => r(e.target.result);
-                    reader.readAsDataURL(file);
+                    reader.readAsText(file); // IMPORTANTE: Ler como texto
                 });
             }
 
             await db.collection("games").add({
                 title, pic, desc, data: finalData, type: postMethod,
+                author: currentUser.email,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             closeModals();
         }
 
-        async function playGame(id) {
+        // CONSERTO PARA ABRIR O JOGO
+        async function openGame(id) {
             const g = allGames.find(x => x.id === id);
             document.getElementById('pgTitle').innerText = g.title;
             const iframe = document.getElementById('gameIframe');
@@ -224,27 +235,21 @@
             if(g.type === 'link') {
                 iframe.src = g.data;
             } else {
-                const zipBase64 = g.data.split(',')[1];
-                const jszip = new JSZip();
-                const zip = await jszip.loadAsync(zipBase64, {base64: true});
-                const htmlFile = zip.file(/index\.html/i)[0];
+                // Limpa blob anterior para não travar a memória
+                if(currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
                 
-                const blobMap = {};
-                for (let path in zip.files) {
-                    if (!zip.files[path].dir) {
-                        const content = await zip.files[path].async("blob");
-                        blobMap[path] = URL.createObjectURL(content);
-                    }
-                }
-
-                let htmlContent = await htmlFile.async("string");
-                for (let path in blobMap) {
-                    htmlContent = htmlContent.split(path).join(blobMap[path]);
-                }
-
-                iframe.src = URL.createObjectURL(new Blob([htmlContent], {type: 'text/html'}));
+                // CRIA UM ARQUIVO TEMPORÁRIO PARA O NAVEGADOR LER
+                const blob = new Blob([g.data], {type: 'text/html'});
+                currentBlobUrl = URL.createObjectURL(blob);
+                iframe.src = currentBlobUrl;
             }
             document.getElementById('gamePage').style.display = 'flex';
+        }
+
+        function closeGame() {
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('gameIframe').src = '';
+            if(currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
         }
 
         function switchTab(m) {
@@ -258,6 +263,7 @@
         function handleAuth() {
             const email = document.getElementById('emailIn').value;
             const nick = document.getElementById('nickIn').value;
+            if(!email || !nick) return alert("PREENCHA TUDO");
             localStorage.setItem('gh_sess', JSON.stringify({email, nick}));
             location.reload();
         }
@@ -265,7 +271,6 @@
         function logout() { localStorage.removeItem('gh_sess'); location.reload(); }
         function openModal(id) { document.getElementById('modalOverlay').style.display='block'; document.getElementById(id).style.display='block'; }
         function closeModals() { document.querySelectorAll('.modal-box, .modal-overlay').forEach(e => e.style.display='none'); }
-        function closeGame() { document.getElementById('gamePage').style.display='none'; document.getElementById('gameIframe').src=''; }
 
         init();
     </script>
