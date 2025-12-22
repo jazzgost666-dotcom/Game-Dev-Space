@@ -55,7 +55,6 @@
         .nav-right { display: flex; gap: 15px; align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-main:hover { box-shadow: var(--glow); transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 
         .user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 5px 12px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #1e293b; }
@@ -97,8 +96,6 @@
 
         .ai-container { background: rgba(139, 92, 246, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.2); margin: 15px 0; }
         .ai-preview-img { width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-top: 10px; display: none; border: 1px solid var(--accent); }
-        .loading-ai { font-size: 0.7rem; color: var(--accent); animation: pulse 1.5s infinite; display: none; text-align: center; margin: 10px 0; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -156,10 +153,18 @@
     <div class="modal-overlay" id="modalOverlay" onclick="closeModals()"></div>
     
     <div class="modal-box" id="authModal">
-        <h2 style="margin-top:0">PERFIL</h2>
-        <input type="email" id="emailIn" placeholder="E-MAIL (Login)">
+        <h2 style="margin-top:0">CONTA</h2>
+        <input type="email" id="emailIn" placeholder="SEU E-MAIL REAL">
         <input type="text" id="nickIn" placeholder="NICKNAME">
-        <button class="btn-main" style="width:100%; margin-top: 20px;" onclick="handleAuth()">SALVAR / ENTRAR</button>
+        
+        <div style="margin-top: 10px;">
+            <label style="font-size: 0.8rem; color: #94a3b8;">FOTO DE PERFIL:</label>
+            <label for="picUpload" class="file-upload-label">📁 UPLOAD DE FOTO</label>
+            <input type="file" id="picUpload" accept="image/*" onchange="previewFile('picUpload', 'picPreview')">
+            <img id="picPreview" src="" style="width: 60px; height: 60px; border-radius: 50%; display: none; margin: 10px auto; object-fit: cover; border: 2px solid var(--accent);">
+        </div>
+
+        <button class="btn-main" style="width:100%; margin-top: 10px;" onclick="handleAuth()">ENTRAR / CRIAR</button>
     </div>
 
     <div class="modal-box" id="postModal">
@@ -168,7 +173,7 @@
         
         <div class="ai-container">
             <div style="font-size: 0.7rem; font-weight: 900; color: var(--accent); margin-bottom: 8px;">CAPA COM MINI AI ✨</div>
-            <textarea id="aiPrompt" placeholder="Descreva sua capa" rows="2" style="font-size: 0.8rem;"></textarea>
+            <textarea id="aiPrompt" placeholder="Descreva a capa" rows="2" style="font-size: 0.8rem;"></textarea>
             <button class="btn-main" style="width: 100%; font-size: 0.7rem; background: #4c1d95;" onclick="generateCoverAI()">GERAR CAPA</button>
             <img id="aiPreview" class="ai-preview-img">
             <input type="hidden" id="postPic">
@@ -177,11 +182,11 @@
         <div style="margin: 15px 0;">
             <div style="display: flex; gap: 15px; margin-bottom: 10px; border-bottom: 1px solid #333;">
                 <span class="tab-btn active" id="tabLink" onclick="switchTab('link')">LINK</span>
-                <span class="tab-btn" id="tabUpload" onclick="switchTab('upload')">ARQUIVO HTML</span>
+                <span class="tab-btn" id="tabUpload" onclick="switchTab('upload')">HTML</span>
             </div>
             <div id="methodLink"><input type="text" id="postUrl" placeholder="URL DO JOGO"></div>
             <div id="methodUpload" style="display: none;">
-                <label for="gameUpload" class="file-upload-label">UPLOAD HTML</label>
+                <label for="gameUpload" class="file-upload-label">SELECIONAR HTML</label>
                 <input type="file" id="gameUpload" accept=".html">
                 <div id="fileNameDisplay" style="font-size: 0.7rem; color: var(--accent);"></div>
             </div>
@@ -218,30 +223,42 @@
             lucide.createIcons();
         }
 
-        async function generateCoverAI() {
-            const p = document.getElementById('aiPrompt').value;
-            if(!p) return alert("Descreva a capa");
-            const url = `https://pollinations.ai/p/${encodeURIComponent(p)}?width=600&height=350&nologo=true`;
-            document.getElementById('aiPreview').src = url;
-            document.getElementById('aiPreview').style.display = "block";
-            document.getElementById('postPic').value = url;
-        }
-
         const toBase64 = file => new Promise((res, rej) => {
             const r = new FileReader(); r.readAsDataURL(file);
             r.onload = () => res(r.result); r.onerror = e => rej(e);
         });
 
-        function switchTab(m) {
-            postMethod = m;
-            document.getElementById('tabLink').classList.toggle('active', m === 'link');
-            document.getElementById('tabUpload').classList.toggle('active', m === 'upload');
-            document.getElementById('methodLink').style.display = m === 'link' ? 'block' : 'none';
-            document.getElementById('methodUpload').style.display = m === 'upload' ? 'block' : 'none';
+        async function handleAuth() {
+            const email = document.getElementById('emailIn').value;
+            const nick = document.getElementById('nickIn').value;
+            const picFile = document.getElementById('picUpload').files[0];
+
+            // Validação de e-mail real
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!emailRegex.test(email)) return alert("POR FAVOR, INSIRA UM E-MAIL VÁLIDO!");
+            if(!nick) return alert("DIGITE UM NICKNAME!");
+
+            let avatar = "";
+            if(picFile) avatar = await toBase64(picFile);
+
+            // Tenta buscar se o usuário já existe no banco
+            const userDoc = await db.collection("users").doc(email).get();
+            
+            if(!userDoc.exists) {
+                // Cadastro novo
+                await db.collection("users").doc(email).set({
+                    email, nick, pic: avatar, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+
+            const userData = userDoc.exists ? userDoc.data() : { email, nick, pic: avatar };
+            currentUser = userData;
+            localStorage.setItem('gh_sess', JSON.stringify(currentUser));
+            location.reload();
         }
 
         async function saveGame() {
-            if(!currentUser) return alert("LOGUE");
+            if(!currentUser) return alert("LOGUE PRIMEIRO!");
             const title = document.getElementById('postTitle').value;
             const pic = document.getElementById('postPic').value;
             const desc = document.getElementById('postDesc').value;
@@ -253,7 +270,7 @@
                 if(f) url = await toBase64(f);
             }
 
-            if(!title || !url) return alert("PREENCHA TUDO");
+            if(!title || !url) return alert("TITULO OU ARQUIVO FALTANDO!");
 
             await db.collection("games").add({
                 title, pic, url, desc, likes: 0, likedBy: [],
@@ -273,29 +290,26 @@
             document.getElementById('descText').innerText = g.desc || "";
             document.getElementById('gamePage').style.display = 'flex';
 
-            // ATUALIZA VISUAL DO LIKE
             if(currentUser && g.likedBy?.includes(currentUser.email)) btn.classList.add('liked');
             else btn.classList.remove('liked');
 
-            // FUNÇÃO DE LIKE CORRIGIDA
             btn.onclick = async () => {
-                if(!currentUser) return alert("LOGUE");
+                if(!currentUser) return alert("LOGUE PARA CURTIR!");
                 const fresh = await db.collection("games").doc(id).get();
-                const data = fresh.data();
-                if(data.likedBy?.includes(currentUser.email)) return;
+                if(fresh.data().likedBy?.includes(currentUser.email)) return;
 
                 await db.collection("games").doc(id).update({
                     likes: firebase.firestore.FieldValue.increment(1),
                     likedBy: firebase.firestore.FieldValue.arrayUnion(currentUser.email)
                 });
                 btn.classList.add('liked');
-                document.getElementById('likeCount').innerText = (data.likes || 0) + 1;
+                document.getElementById('likeCount').innerText = (g.likes || 0) + 1;
             };
 
             const del = document.getElementById('btnDelete');
             if(currentUser && (currentUser.email === g.author || currentUser.email === ADMIN)) {
                 del.style.display = 'block';
-                del.onclick = async () => { if(confirm("APAGAR?")) { await db.collection("games").doc(id).delete(); closeGame(); }};
+                del.onclick = async () => { if(confirm("APAGAR JOGO?")) { await db.collection("games").doc(id).delete(); closeGame(); }};
             } else del.style.display = 'none';
         }
 
@@ -315,16 +329,37 @@
             </div>`;
         }
 
-        function handleAuth() {
-            const e = document.getElementById('emailIn').value;
-            const n = document.getElementById('nickIn').value;
-            if(!e) return alert("EMAIL");
-            currentUser = { email: e, nick: n || "PLAYER" };
-            localStorage.setItem('gh_sess', JSON.stringify(currentUser));
-            location.reload();
+        async function generateCoverAI() {
+            const p = document.getElementById('aiPrompt').value;
+            if(!p) return alert("DESCREVA A CAPA!");
+            const url = `https://pollinations.ai/p/${encodeURIComponent(p)}?width=600&height=350&nologo=true`;
+            document.getElementById('aiPreview').src = url;
+            document.getElementById('aiPreview').style.display = "block";
+            document.getElementById('postPic').value = url;
         }
 
-        function updateNavUser() { document.getElementById('navUser').innerText = currentUser.nick; }
+        function previewFile(inputId, imgId) {
+            const file = document.getElementById(inputId).files[0];
+            const preview = document.getElementById(imgId);
+            if(file){
+                const reader = new FileReader();
+                reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function switchTab(m) {
+            postMethod = m;
+            document.getElementById('tabLink').classList.toggle('active', m === 'link');
+            document.getElementById('tabUpload').classList.toggle('active', m === 'upload');
+            document.getElementById('methodLink').style.display = m === 'link' ? 'block' : 'none';
+            document.getElementById('methodUpload').style.display = m === 'upload' ? 'block' : 'none';
+        }
+
+        function updateNavUser() { 
+            document.getElementById('navUser').innerText = currentUser.nick; 
+            if(currentUser.pic) document.getElementById('navAvatar').src = currentUser.pic;
+        }
         function logout() { localStorage.removeItem('gh_sess'); location.reload(); }
         function openModal(id) { document.getElementById('modalOverlay').style.display='block'; document.getElementById(id).style.display='block'; }
         function closeModals() { document.getElementById('modalOverlay').style.display='none'; document.getElementById('authModal').style.display='none'; document.getElementById('postModal').style.display='none'; }
