@@ -294,6 +294,7 @@
       border: 1px solid rgba(255, 215, 0, 0.2);
       transition: all 0.4s ease;
       position: relative;
+      cursor: pointer;
     }
 
     .game-card:hover {
@@ -408,6 +409,8 @@
       background: transparent;
       border: 2px solid var(--secondary) !important;
       color: var(--secondary);
+      flex: 0;
+      padding: 10px 15px;
     }
 
     .like-btn:hover, .like-btn.liked {
@@ -418,6 +421,8 @@
     .edit-btn {
       background: var(--gold);
       color: var(--dark);
+      flex: 0;
+      padding: 10px 15px;
     }
 
     .modal {
@@ -550,6 +555,7 @@
       font-size: 3rem;
       color: var(--gold);
       margin-bottom: 15px;
+      display: block;
     }
 
     .file-upload p {
@@ -619,128 +625,7 @@
       cursor: not-allowed;
     }
 
-    .game-player-modal {
-      max-width: 95%;
-      width: 95%;
-      height: 95vh;
-    }
-
-    .game-frame-container {
-      width: 100%;
-      height: 60vh;
-      position: relative;
-      background: #000;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .game-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: white;
-    }
-
-    .fullscreen-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid var(--gold);
-      color: var(--gold);
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.3s ease;
-    }
-
-    .fullscreen-btn:hover {
-      background: var(--gold);
-      color: var(--dark);
-    }
-
-    .comments-section {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 215, 0, 0.3);
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .comments-title {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--gold);
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .comment {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      border-left: 3px solid var(--primary);
-    }
-
-    .comment-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .comment-author {
-      color: var(--ice-blue);
-      font-weight: 600;
-    }
-
-    .comment-date {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-    }
-
-    .comment-text {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .comment-input-container {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .comment-input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid rgba(255, 215, 0, 0.3);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--snow);
-      font-family: 'Rajdhani', sans-serif;
-    }
-
-    .comment-input:focus {
-      outline: none;
-      border-color: var(--gold);
-    }
-
-    .comment-submit {
-      padding: 12px 25px;
-      background: var(--primary);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .comment-submit:hover {
-      background: var(--primary-light);
-    }
-
-    .ai-section {
+    .cover-section {
       background: linear-gradient(145deg, rgba(196, 30, 58, 0.2), rgba(26, 95, 42, 0.3));
       border-radius: 15px;
       padding: 20px;
@@ -748,7 +633,7 @@
       border: 1px solid rgba(255, 215, 0, 0.3);
     }
 
-    .ai-title {
+    .cover-title {
       font-family: 'Orbitron', sans-serif;
       color: var(--gold);
       margin-bottom: 15px;
@@ -757,7 +642,7 @@
       gap: 10px;
     }
 
-    .ai-preview {
+    .cover-preview {
       width: 100%;
       height: 200px;
       border-radius: 10px;
@@ -766,31 +651,14 @@
       align-items: center;
       justify-content: center;
       background: rgba(0, 0, 0, 0.3);
-      margin-bottom: 15px;
+      margin-top: 15px;
       overflow: hidden;
     }
 
-    .ai-preview img {
+    .cover-preview img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-    }
-
-    .ai-generate-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(45deg, #6b46c1, #9f7aea);
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .ai-generate-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 20px rgba(159, 122, 234, 0.5);
     }
 
     .user-menu {
@@ -903,18 +771,30 @@
     .empty-state {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 50px;
+      padding: 80px 20px;
+      background: linear-gradient(145deg, rgba(26, 95, 42, 0.3), rgba(10, 26, 15, 0.5));
+      border-radius: 20px;
+      border: 2px dashed rgba(255, 215, 0, 0.3);
     }
 
     .empty-state i {
-      font-size: 4rem;
+      font-size: 5rem;
       color: var(--gold);
       opacity: 0.5;
       margin-bottom: 20px;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--gold);
+      margin-bottom: 10px;
+      font-size: 1.5rem;
     }
 
     .empty-state p {
       color: rgba(255, 255, 255, 0.6);
+      font-size: 1.1rem;
     }
 
     ::-webkit-scrollbar {
@@ -973,7 +853,7 @@
   </style>
 </head>
 <body>
-  <div class="animated-bg"></div>
+  <div class="animated-bg" id="animatedBg"></div>
   <div class="wire"></div>
   <div class="christmas-lights" id="christmasLights"></div>
 
@@ -1120,7 +1000,7 @@
           </div>
           
           <div class="form-group">
-            <label><i class="fas fa-file-code"></i> Arquivos do Jogo</label>
+            <label><i class="fas fa-file-code"></i> Arquivos do Jogo (HTML obrigatorio)</label>
             <div class="file-upload" onclick="document.getElementById('gameFiles').click()">
               <i class="fas fa-cloud-upload-alt"></i>
               <p>Clique para selecionar arquivos</p>
@@ -1130,13 +1010,16 @@
             <div class="file-list" id="fileList"></div>
           </div>
 
-          <div class="ai-section">
-            <h3 class="ai-title"><i class="fas fa-magic"></i> Capa do Jogo</h3>
-            <div class="form-group">
-              <label><i class="fas fa-image"></i> Imagem de Capa</label>
-              <input type="file" id="coverImageInput" accept="image/*" onchange="handleCoverSelect(this)">
+          <div class="cover-section">
+            <h3 class="cover-title"><i class="fas fa-image"></i> Capa do Jogo (Opcional)</h3>
+            <div class="form-group" style="margin-bottom:0;">
+              <input type="file" id="coverImageInput" accept="image/*" onchange="handleCoverSelect(this)" style="display:none;">
+              <div class="file-upload" onclick="document.getElementById('coverImageInput').click()">
+                <i class="fas fa-image"></i>
+                <p>Clique para selecionar a capa</p>
+              </div>
             </div>
-            <div class="ai-preview" id="aiPreview">
+            <div class="cover-preview" id="coverPreview">
               <i class="fas fa-image" style="font-size:3rem;color:var(--gold);opacity:0.5;"></i>
             </div>
           </div>
@@ -1145,37 +1028,6 @@
             <i class="fas fa-rocket"></i> Publicar Jogo
           </button>
         </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Game Player Modal -->
-  <div class="modal" id="gamePlayerModal">
-    <div class="modal-content game-player-modal">
-      <div class="modal-header">
-        <h2 id="gamePlayerTitle"><i class="fas fa-play"></i> Jogando</h2>
-        <div style="display:flex;gap:10px;">
-          <button class="fullscreen-btn" onclick="toggleFullscreen()">
-            <i class="fas fa-expand"></i>
-          </button>
-          <button class="close-btn" onclick="closeModal('gamePlayerModal')">&times;</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="game-frame-container" id="gameFrameContainer">
-          <iframe id="gameFrame" class="game-frame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
-        </div>
-        
-        <div class="comments-section">
-          <h3 class="comments-title"><i class="fas fa-comments"></i> Comentarios</h3>
-          <div id="commentsContainer"></div>
-          <div class="comment-input-container">
-            <input type="text" class="comment-input" id="commentInput" placeholder="Escreva um comentario...">
-            <button class="comment-submit" onclick="submitComment()">
-              <i class="fas fa-paper-plane"></i>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1208,7 +1060,6 @@
     let uploadedFiles = [];
     let coverImageFile = null;
     let editingGameId = null;
-    let currentGameId = null;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
@@ -1227,10 +1078,14 @@
         document.getElementById('authButtons').style.display = 'flex';
         document.getElementById('userSection').style.display = 'none';
       }
+      // Re-render games to show edit buttons
+      if (games.length > 0) {
+        renderAllGames();
+      }
     });
 
     function initSnowflakes() {
-      const bg = document.querySelector('.animated-bg');
+      const bg = document.getElementById('animatedBg');
       for (let i = 0; i < 50; i++) {
         const snowflake = document.createElement('div');
         snowflake.className = 'snowflake';
@@ -1259,19 +1114,36 @@
         snapshot.forEach((child) => {
           games.push({ id: child.key, ...child.val() });
         });
-        
-        const featured = [...games].sort((a, b) => ((b.views || 0) + (b.likes || 0)) - ((a.views || 0) + (a.likes || 0))).slice(0, 4);
-        renderGames(games, 'gamesGrid');
-        renderGames(featured, 'featuredGrid', true);
+        renderAllGames();
+      }, (error) => {
+        console.error('Erro ao carregar jogos:', error);
+        document.getElementById('gamesGrid').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Erro ao carregar</h3><p>Nao foi possivel carregar os jogos</p></div>';
+        document.getElementById('featuredGrid').innerHTML = '';
       });
     }
 
-    function renderGames(gamesToRender, containerId, isFeatured = false) {
+    function renderAllGames() {
+      const featured = [...games].sort((a, b) => ((b.views || 0) + (b.likes || 0)) - ((a.views || 0) + (a.likes || 0))).slice(0, 4);
+      renderGames(games, 'gamesGrid', false);
+      renderGames(featured, 'featuredGrid', true);
+    }
+
+    function renderGames(gamesToRender, containerId, isFeatured) {
       const container = document.getElementById(containerId);
       if (!container) return;
 
       if (gamesToRender.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-gamepad"></i><p>Nenhum jogo encontrado</p></div>';
+        if (isFeatured) {
+          container.innerHTML = '';
+        } else {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-gamepad"></i>
+              <h3>Nenhum jogo publicado ainda</h3>
+              <p>Seja o primeiro a publicar seu jogo!</p>
+            </div>
+          `;
+        }
         return;
       }
 
@@ -1282,24 +1154,23 @@
         return `
           <div class="game-card ${isFeatured ? 'featured' : ''}">
             ${isFeatured ? '<div class="featured-badge"><i class="fas fa-star"></i> Destaque</div>' : ''}
-            <img src="${game.coverUrl || 'https://via.placeholder.com/400x200/1a5f2a/ffd700?text=Game'}" alt="${escapeHtml(game.title)}" class="game-thumbnail">
+            <img src="${game.coverUrl || 'https://via.placeholder.com/400x200/1a5f2a/ffd700?text=' + encodeURIComponent(game.title)}" alt="${escapeHtml(game.title)}" class="game-thumbnail" onerror="this.src='https://via.placeholder.com/400x200/1a5f2a/ffd700?text=Game'">
             <div class="game-info">
               <h3 class="game-title">${escapeHtml(game.title)}</h3>
               <p class="game-description">${escapeHtml(game.description)}</p>
               <div class="game-stats">
                 <span class="stat"><i class="fas fa-eye"></i> ${game.views || 0}</span>
                 <span class="stat"><i class="fas fa-heart"></i> ${game.likes || 0}</span>
-                <span class="stat"><i class="fas fa-comment"></i> ${game.commentsCount || 0}</span>
               </div>
-              <p class="game-author"><i class="fas fa-user"></i> ${escapeHtml(game.authorName)}</p>
+              <p class="game-author"><i class="fas fa-user"></i> ${escapeHtml(game.authorName || 'Anonimo')}</p>
               <div class="game-actions">
-                <button class="action-btn play-btn" onclick="window.playGame('${game.id}')">
+                <button class="action-btn play-btn" onclick="event.stopPropagation(); window.playGame('${game.id}')">
                   <i class="fas fa-play"></i> Jogar
                 </button>
-                <button class="action-btn like-btn ${isLiked ? 'liked' : ''}" onclick="window.toggleLike('${game.id}')">
+                <button class="action-btn like-btn ${isLiked ? 'liked' : ''}" onclick="event.stopPropagation(); window.toggleLike('${game.id}')">
                   <i class="fas fa-heart"></i>
                 </button>
-                ${isOwner ? `<button class="action-btn edit-btn" onclick="window.editGame('${game.id}')"><i class="fas fa-edit"></i></button>` : ''}
+                ${isOwner ? `<button class="action-btn edit-btn" onclick="event.stopPropagation(); window.editGame('${game.id}')"><i class="fas fa-edit"></i></button>` : ''}
               </div>
             </div>
           </div>
@@ -1329,9 +1200,6 @@
 
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
-      if (id === 'gamePlayerModal') {
-        document.getElementById('gameFrame').src = 'about:blank';
-      }
       if (id === 'uploadModal') {
         resetUploadForm();
       }
@@ -1344,7 +1212,7 @@
       coverImageFile = null;
       editingGameId = null;
       document.getElementById('fileList').innerHTML = '';
-      document.getElementById('aiPreview').innerHTML = '<i class="fas fa-image" style="font-size:3rem;color:var(--gold);opacity:0.5;"></i>';
+      document.getElementById('coverPreview').innerHTML = '<i class="fas fa-image" style="font-size:3rem;color:var(--gold);opacity:0.5;"></i>';
       document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-rocket"></i> Publicar Jogo';
       document.getElementById('uploadModalTitle').innerHTML = '<i class="fas fa-gamepad"></i> Publicar Jogo';
     }
@@ -1362,6 +1230,8 @@
         await signInWithEmailAndPassword(auth, email, password);
         closeModal('loginModal');
         showToast('Bem-vindo de volta!', 'success');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
       } catch (error) {
         showToast(getErrorMessage(error.code), 'error');
       } finally {
@@ -1389,6 +1259,9 @@
         });
         closeModal('registerModal');
         showToast('Conta criada com sucesso!', 'success');
+        document.getElementById('registerName').value = '';
+        document.getElementById('registerEmail').value = '';
+        document.getElementById('registerPassword').value = '';
       } catch (error) {
         showToast(getErrorMessage(error.code), 'error');
       } finally {
@@ -1412,24 +1285,28 @@
     }
 
     function handleFileSelect(input) {
-      const fileList = document.getElementById('fileList');
       for (const file of input.files) {
         if (!uploadedFiles.some(f => f.name === file.name)) {
           uploadedFiles.push(file);
         }
       }
+      renderFileList();
+    }
+
+    function renderFileList() {
+      const fileList = document.getElementById('fileList');
       fileList.innerHTML = uploadedFiles.map((file, i) => `
         <div class="file-item">
           <i class="fas fa-file-code"></i>
           <span>${file.name}</span>
-          <button class="remove-file" onclick="window.removeFile(${i})"><i class="fas fa-times"></i></button>
+          <button type="button" class="remove-file" onclick="window.removeFile(${i})"><i class="fas fa-times"></i></button>
         </div>
       `).join('');
     }
 
     function removeFile(index) {
       uploadedFiles.splice(index, 1);
-      handleFileSelect({ files: [] });
+      renderFileList();
     }
 
     function handleCoverSelect(input) {
@@ -1438,7 +1315,7 @@
         coverImageFile = file;
         const reader = new FileReader();
         reader.onload = (e) => {
-          document.getElementById('aiPreview').innerHTML = `<img src="${e.target.result}" alt="Cover">`;
+          document.getElementById('coverPreview').innerHTML = `<img src="${e.target.result}" alt="Cover">`;
         };
         reader.readAsDataURL(file);
       }
@@ -1449,15 +1326,21 @@
       
       if (!currentUser) {
         showToast('Faca login para publicar', 'error');
+        openModal('loginModal');
         return;
       }
 
-      const title = document.getElementById('gameTitle').value;
-      const description = document.getElementById('gameDescription').value;
+      const title = document.getElementById('gameTitle').value.trim();
+      const description = document.getElementById('gameDescription').value.trim();
       const btn = document.getElementById('uploadBtn');
 
+      if (!title || !description) {
+        showToast('Preencha todos os campos', 'error');
+        return;
+      }
+
       if (editingGameId) {
-        await updateGame(title, description);
+        await updateGame(title, description, btn);
         return;
       }
 
@@ -1466,19 +1349,21 @@
         return;
       }
 
-      const hasHtml = uploadedFiles.some(f => f.name.endsWith('.html'));
+      const hasHtml = uploadedFiles.some(f => f.name.toLowerCase().endsWith('.html'));
       if (!hasHtml) {
         showToast('Adicione um arquivo HTML principal', 'error');
         return;
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div>';
+      btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Publicando...';
 
       try {
+        // Create game entry first
         const gameRef = push(ref(database, 'games'));
         const gameId = gameRef.key;
 
+        // Upload all game files
         const fileUrls = {};
         for (const file of uploadedFiles) {
           const fileRef = storageRef(storage, `games/${gameId}/${file.name}`);
@@ -1487,6 +1372,7 @@
           fileUrls[file.name] = url;
         }
 
+        // Upload cover if exists
         let coverUrl = null;
         if (coverImageFile) {
           const coverRef = storageRef(storage, `games/${gameId}/cover.png`);
@@ -1494,41 +1380,47 @@
           coverUrl = await getDownloadURL(coverRef);
         }
 
+        // Get user name
         const userSnapshot = await get(ref(database, 'users/' + currentUser.uid));
-        const userName = userSnapshot.val()?.name || 'Anonimo';
+        const userName = userSnapshot.exists() ? userSnapshot.val().name : 'Anonimo';
 
+        // Save game data
         await set(gameRef, {
-          title,
-          description,
+          title: title,
+          description: description,
           authorId: currentUser.uid,
           authorName: userName,
           files: fileUrls,
-          coverUrl,
+          coverUrl: coverUrl,
           views: 0,
           likes: 0,
-          commentsCount: 0,
           createdAt: Date.now()
         });
 
         closeModal('uploadModal');
         showToast('Jogo publicado com sucesso!', 'success');
+
       } catch (error) {
-        console.error(error);
-        showToast('Erro ao publicar jogo', 'error');
+        console.error('Erro ao publicar:', error);
+        showToast('Erro ao publicar jogo: ' + error.message, 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-rocket"></i> Publicar Jogo';
       }
     }
 
-    async function updateGame(title, description) {
-      const btn = document.getElementById('uploadBtn');
+    async function updateGame(title, description, btn) {
       btn.disabled = true;
-      btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div>';
+      btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Atualizando...';
 
       try {
-        const updates = { title, description, updatedAt: Date.now() };
+        const updates = { 
+          title: title, 
+          description: description, 
+          updatedAt: Date.now() 
+        };
 
+        // Upload new files if any
         if (uploadedFiles.length > 0) {
           const fileUrls = {};
           for (const file of uploadedFiles) {
@@ -1538,9 +1430,10 @@
             fileUrls[file.name] = url;
           }
           const currentGame = games.find(g => g.id === editingGameId);
-          updates.files = { ...currentGame.files, ...fileUrls };
+          updates.files = { ...(currentGame.files || {}), ...fileUrls };
         }
 
+        // Upload new cover if provided
         if (coverImageFile) {
           const coverRef = storageRef(storage, `games/${editingGameId}/cover.png`);
           await uploadBytes(coverRef, coverImageFile);
@@ -1549,10 +1442,11 @@
 
         await update(ref(database, 'games/' + editingGameId), updates);
         closeModal('uploadModal');
-        showToast('Jogo atualizado!', 'success');
+        showToast('Jogo atualizado com sucesso!', 'success');
+
       } catch (error) {
-        console.error(error);
-        showToast('Erro ao atualizar', 'error');
+        console.error('Erro ao atualizar:', error);
+        showToast('Erro ao atualizar jogo', 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save"></i> Atualizar Jogo';
@@ -1560,11 +1454,19 @@
     }
 
     function editGame(gameId) {
-      if (!currentUser) return;
+      if (!currentUser) {
+        showToast('Faca login primeiro', 'error');
+        return;
+      }
       
       const game = games.find(g => g.id === gameId);
-      if (!game || game.authorId !== currentUser.uid) {
-        showToast('Sem permissao', 'error');
+      if (!game) {
+        showToast('Jogo nao encontrado', 'error');
+        return;
+      }
+
+      if (game.authorId !== currentUser.uid) {
+        showToast('Voce nao tem permissao para editar este jogo', 'error');
         return;
       }
 
@@ -1573,38 +1475,39 @@
       document.getElementById('gameDescription').value = game.description;
       document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-save"></i> Atualizar Jogo';
       document.getElementById('uploadModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Jogo';
+      
+      if (game.coverUrl) {
+        document.getElementById('coverPreview').innerHTML = `<img src="${game.coverUrl}" alt="Cover">`;
+      }
+      
       openModal('uploadModal');
     }
 
     async function playGame(gameId) {
       const game = games.find(g => g.id === gameId);
-      if (!game) return;
+      if (!game) {
+        showToast('Jogo nao encontrado', 'error');
+        return;
+      }
 
-      currentGameId = gameId;
+      // Increment views
+      try {
+        await update(ref(database, 'games/' + gameId), {
+          views: (game.views || 0) + 1
+        });
+      } catch (e) {
+        console.log('Erro ao atualizar views:', e);
+      }
 
-      await update(ref(database, 'games/' + gameId), {
-        views: (game.views || 0) + 1
-      });
-
-      const htmlFile = Object.keys(game.files).find(f => f.endsWith('.html'));
+      // Find HTML file
+      const htmlFile = Object.keys(game.files || {}).find(f => f.toLowerCase().endsWith('.html'));
       if (!htmlFile) {
         showToast('Arquivo HTML nao encontrado', 'error');
         return;
       }
 
-      document.getElementById('gamePlayerTitle').innerHTML = `<i class="fas fa-play"></i> ${escapeHtml(game.title)}`;
-      document.getElementById('gameFrame').src = game.files[htmlFile];
-      loadComments(gameId);
-      openModal('gamePlayerModal');
-    }
-
-    function toggleFullscreen() {
-      const container = document.getElementById('gameFrameContainer');
-      if (!document.fullscreenElement) {
-        container.requestFullscreen().catch(err => showToast('Erro ao entrar em tela cheia', 'error'));
-      } else {
-        document.exitFullscreen();
-      }
+      // Open game in new tab
+      window.open(game.files[htmlFile], '_blank');
     }
 
     async function toggleLike(gameId) {
@@ -1631,95 +1534,42 @@
           });
         }
       } catch (error) {
+        console.error('Erro ao curtir:', error);
         showToast('Erro ao curtir', 'error');
-      }
-    }
-
-    function loadComments(gameId) {
-      const commentsRef = ref(database, `comments/${gameId}`);
-      onValue(commentsRef, (snapshot) => {
-        const comments = [];
-        snapshot.forEach(child => {
-          comments.push({ id: child.key, ...child.val() });
-        });
-        comments.sort((a, b) => b.createdAt - a.createdAt);
-
-        const container = document.getElementById('commentsContainer');
-        container.innerHTML = comments.map(c => `
-          <div class="comment">
-            <div class="comment-header">
-              <span class="comment-author">${escapeHtml(c.authorName)}</span>
-              <span class="comment-date">${new Date(c.createdAt).toLocaleDateString('pt-BR')}</span>
-            </div>
-            <p class="comment-text">${escapeHtml(c.text)}</p>
-          </div>
-        `).join('') || '<p style="color:rgba(255,255,255,0.5);text-align:center;">Nenhum comentario ainda</p>';
-      });
-    }
-
-    async function submitComment() {
-      if (!currentUser) {
-        showToast('Faca login para comentar', 'error');
-        return;
-      }
-
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-      if (!text || !currentGameId) return;
-
-      try {
-        const userSnapshot = await get(ref(database, 'users/' + currentUser.uid));
-        const userName = userSnapshot.val()?.name || 'Anonimo';
-
-        await push(ref(database, `comments/${currentGameId}`), {
-          authorId: currentUser.uid,
-          authorName: userName,
-          text,
-          createdAt: Date.now()
-        });
-
-        const game = games.find(g => g.id === currentGameId);
-        await update(ref(database, 'games/' + currentGameId), {
-          commentsCount: (game.commentsCount || 0) + 1
-        });
-
-        input.value = '';
-        showToast('Comentario adicionado!', 'success');
-      } catch (error) {
-        showToast('Erro ao comentar', 'error');
       }
     }
 
     function handleSearch() {
       const query = document.getElementById('searchInput').value.toLowerCase().trim();
       if (!query) {
-        renderGames(games, 'gamesGrid');
+        renderGames(games, 'gamesGrid', false);
         return;
       }
       const filtered = games.filter(g => 
-        g.title.toLowerCase().includes(query) ||
-        g.description.toLowerCase().includes(query) ||
-        g.authorName.toLowerCase().includes(query)
+        (g.title && g.title.toLowerCase().includes(query)) ||
+        (g.description && g.description.toLowerCase().includes(query)) ||
+        (g.authorName && g.authorName.toLowerCase().includes(query))
       );
-      renderGames(filtered, 'gamesGrid');
+      renderGames(filtered, 'gamesGrid', false);
     }
 
     function getErrorMessage(code) {
       const messages = {
         'auth/email-already-in-use': 'Este email ja esta em uso',
         'auth/invalid-email': 'Email invalido',
-        'auth/weak-password': 'Senha muito fraca',
+        'auth/weak-password': 'Senha muito fraca (minimo 6 caracteres)',
         'auth/user-not-found': 'Usuario nao encontrado',
-        'auth/wrong-password': 'Senha incorreta'
+        'auth/wrong-password': 'Senha incorreta',
+        'auth/invalid-credential': 'Email ou senha incorretos'
       };
-      return messages[code] || 'Ocorreu um erro';
+      return messages[code] || 'Ocorreu um erro: ' + code;
     }
 
     // Close dropdown on outside click
     document.addEventListener('click', (e) => {
       const dropdown = document.getElementById('userDropdown');
       const userMenu = document.querySelector('.user-menu');
-      if (dropdown && !userMenu?.contains(e.target)) {
+      if (dropdown && userMenu && !userMenu.contains(e.target)) {
         dropdown.classList.remove('active');
       }
     });
@@ -1736,7 +1586,7 @@
       if (e.key === 'Enter') handleSearch();
     });
 
-    // Global functions
+    // Make functions globally available
     window.openModal = openModal;
     window.closeModal = closeModal;
     window.handleLogin = handleLogin;
@@ -1750,8 +1600,6 @@
     window.playGame = playGame;
     window.editGame = editGame;
     window.toggleLike = toggleLike;
-    window.toggleFullscreen = toggleFullscreen;
-    window.submitComment = submitComment;
     window.handleSearch = handleSearch;
   </script>
 </body>
