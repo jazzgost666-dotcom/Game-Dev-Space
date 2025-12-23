@@ -13,19 +13,15 @@ if (!firebase.apps.length) {
 }
 const db = firebase.firestore();
 
-// "IA" de checagem de Malware (Filtro Heurístico)
+// "IA" de checagem de código malicioso
 async function scanFileSecurity(fileContent) {
     const dangerousPatterns = [
         /document\.cookie/gi, 
         /localStorage\.clear/gi, 
-        /sessionStorage/gi,
         /parent\.location/gi, 
-        /top\.location/gi,
         /<script.*src.*http/gi,
-        /eval\(/gi,
-        /window\.open/gi
+        /eval\(/gi
     ];
-    
     for (let pattern of dangerousPatterns) {
         if (pattern.test(fileContent)) return false;
     }
