@@ -1,391 +1,281 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAMEHUB | Cloud Security</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        :root {
-            --bg-dark: #070b14;
-            --accent: #8b5cf6;
-            --card-bg: rgba(15, 23, 42, 0.9);
-            --text: #f8fafc;
-            --danger: #ef4444;
-            --glow: 0 0 15px rgba(139, 92, 246, 0.6);
-        }
-
-        body {
-            margin: 0; font-family: 'Inter', sans-serif;
-            background: var(--bg-dark); color: var(--text);
-            min-height: 100vh; overflow-x: hidden;
-        }
-
-        .bg-animation {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 80px 80px; animation: moveGrid 30s linear infinite;
-        }
-
-        @keyframes moveGrid { from { background-position: 0 0; } to { background-position: 80px 80px; } }
-
-        .btn-primary { 
-            background: var(--accent); color: white; padding: 10px 20px; 
-            border-radius: 6px; font-weight: bold; transition: 0.3s;
-        }
-        .btn-primary:hover { box-shadow: var(--glow); transform: translateY(-1px); }
-        
-        .game-card {
-            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .game-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: scale(1.02); }
-
-        .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(8px); z-index: 50; display: none; 
-        }
-
-        .game-page {
-            position: fixed; inset: 0; background: var(--bg-dark);
-            z-index: 40; display: none; flex-direction: column;
-        }
-
-        input, textarea {
-            background: rgba(0,0,0,0.3) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: white !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Dev Space - Hub de Jogos Indie</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Animated Background -->
+  <div class="animated-bg"></div>
+  
+  <!-- Christmas Lights -->
+  <div class="wire"></div>
+  <div class="christmas-lights"></div>
+  
+  <!-- Decorative Elements -->
+  <div class="holly"><i class="fas fa-holly-berry"></i></div>
+  <div class="candy-cane"><i class="fas fa-candy-cane"></i></div>
 
-    <div class="bg-animation"></div>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-tree logo-icon"></i>
+      <span>Game Dev Space</span>
+      <i class="fas fa-snowflake" style="font-size:1rem;animation:spin 3s linear infinite;"></i>
+    </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 bg-[#070b14e6] backdrop-blur-md border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <div class="text-2xl font-black text-[#8b5cf6] tracking-tighter">GAMEHUB</div>
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar jogos, desenvolvedores...">
+      <button class="search-btn">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <div class="nav-buttons" id="authButtons">
+      <button class="nav-btn" onclick="openModal('loginModal')">
+        <i class="fas fa-sign-in-alt"></i>
+        Entrar
+      </button>
+      <button class="nav-btn primary" onclick="openModal('registerModal')">
+        <i class="fas fa-user-plus"></i>
+        Criar Conta
+      </button>
+    </div>
+
+    <div class="nav-buttons user-menu" id="userSection" style="display:none;">
+      <button class="nav-btn primary" onclick="openModal('uploadModal')">
+        <i class="fas fa-upload"></i>
+        Publicar Jogo
+      </button>
+      <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=default" 
+           alt="Avatar" class="user-avatar" id="userAvatar" onclick="toggleUserDropdown()">
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-item" onclick="openModal('uploadModal')">
+          <i class="fas fa-gamepad"></i>
+          <span>Meus Jogos</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-cog"></i>
+          <span>Configuracoes</span>
+        </div>
+        <div class="dropdown-item" onclick="handleLogout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sair</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Featured Section -->
+    <section class="featured-section">
+      <h2 class="section-title">
+        <i class="fas fa-star"></i>
+        Jogos em Destaque
+        <i class="fas fa-gift" style="color:var(--secondary);"></i>
+      </h2>
+      <div class="games-grid" id="featuredGrid">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- All Games Section -->
+    <section class="games-section">
+      <h2 class="section-title">
+        <i class="fas fa-gamepad"></i>
+        Todos os Jogos
+        <i class="fas fa-sleigh" style="color:var(--secondary);"></i>
+      </h2>
+      <div class="games-grid" id="gamesGrid">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-sign-in-alt"></i> Entrar</h2>
+        <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="loginEmail" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock"></i> Senha</label>
+            <input type="password" id="loginPassword" required placeholder="Sua senha">
+          </div>
+          <button type="submit" class="submit-btn" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            Entrar
+          </button>
+        </form>
+        <p style="text-align:center;margin-top:20px;color:rgba(255,255,255,0.6);">
+          Nao tem conta? 
+          <a href="#" onclick="closeModal('loginModal');openModal('registerModal');" style="color:var(--gold);">Criar conta</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-plus"></i> Criar Conta</h2>
+        <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Nome</label>
+            <input type="text" id="registerName" required placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="registerEmail" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock"></i> Senha</label>
+            <input type="password" id="registerPassword" required placeholder="Minimo 6 caracteres" minlength="6">
+          </div>
+          <button type="submit" class="submit-btn" id="registerBtn">
+            <i class="fas fa-user-plus"></i>
+            Criar Conta
+          </button>
+        </form>
+        <p style="text-align:center;margin-top:20px;color:rgba(255,255,255,0.6);">
+          Ja tem conta? 
+          <a href="#" onclick="closeModal('registerModal');openModal('loginModal');" style="color:var(--gold);">Entrar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Game Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content" style="max-width:700px;">
+      <div class="modal-header">
+        <h2 id="uploadModalTitle"><i class="fas fa-gamepad"></i> Publicar Jogo</h2>
+        <button class="close-btn" onclick="closeModal('uploadModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="event.preventDefault();handleGameUpload(event);">
+          <div class="form-group">
+            <label><i class="fas fa-heading"></i> Titulo do Jogo</label>
+            <input type="text" id="gameTitle" required placeholder="Nome do seu jogo">
+          </div>
+          
+          <div class="form-group">
+            <label><i class="fas fa-align-left"></i> Descricao</label>
+            <textarea id="gameDescription" required placeholder="Descreva seu jogo..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label><i class="fas fa-file-code"></i> Arquivos do Jogo (HTML, CSS, JS)</label>
+            <div class="file-upload" id="fileUploadArea" onclick="document.getElementById('gameFiles').click()">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Arraste os arquivos aqui ou clique para selecionar</p>
+              <p style="font-size:0.8rem;margin-top:5px;">HTML, CSS, JS, PNG, JPG, GIF, SVG (max 10MB cada)</p>
+            </div>
+            <input type="file" id="gameFiles" multiple accept=".html,.css,.js,.png,.jpg,.jpeg,.gif,.svg" 
+                   style="display:none;" onchange="handleFileSelect(this)">
+            <div class="file-list" id="fileList"></div>
+          </div>
+
+          <!-- AI Cover Generator Section -->
+          <div class="ai-section">
+            <h3 class="ai-title">
+              <i class="fas fa-magic"></i>
+              Capa do Jogo com IA
+            </h3>
+            
+            <div class="form-group">
+              <label><i class="fas fa-image"></i> Imagem Base</label>
+              <input type="file" id="coverImageInput" accept="image/*" onchange="handleCoverSelect(this)">
+            </div>
+            
+            <div class="ai-preview" id="aiPreview">
+              <i class="fas fa-image" style="font-size:3rem;color:var(--gold);opacity:0.5;"></i>
+            </div>
+            
+            <div class="form-group">
+              <label><i class="fas fa-pencil-alt"></i> Descreva as modificacoes desejadas</label>
+              <textarea id="aiCoverDescription" placeholder="Ex: Adicione um efeito neon, mude o fundo para espacial..."></textarea>
+            </div>
+            
+            <button type="button" class="ai-generate-btn" onclick="generateCover()">
+              <i class="fas fa-wand-magic-sparkles"></i>
+              Gerar Capa com IA
+            </button>
+          </div>
+
+          <button type="submit" class="submit-btn" id="uploadBtn" style="margin-top:20px;">
+            <i class="fas fa-rocket"></i>
+            Publicar Jogo
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Player Modal -->
+  <div class="modal" id="gamePlayerModal">
+    <div class="modal-content game-player-modal">
+      <div class="modal-header">
+        <h2 id="gamePlayerTitle"><i class="fas fa-play"></i> Jogando</h2>
+        <div style="display:flex;gap:10px;">
+          <button class="fullscreen-btn" onclick="toggleFullscreen()">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="close-btn" onclick="closeModal('gamePlayerModal')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" style="height:calc(100% - 80px);padding:0;">
+        <div class="game-frame-container">
+          <iframe id="gameFrame" class="game-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
         
-        <div class="flex-1 max-w-md mx-8">
-            <input type="text" id="searchInput" placeholder="Pesquisar jogos..." 
-                   class="w-full px-4 py-2 rounded-lg focus:ring-2 ring-[#8b5cf6] outline-none transition-all">
+        <!-- Comments Section -->
+        <div class="comments-section" style="padding:20px;">
+          <h3 class="comments-title">
+            <i class="fas fa-comments"></i>
+            Comentarios
+          </h3>
+          
+          <div id="commentsContainer">
+            <p style="color:rgba(255,255,255,0.5);text-align:center;">Carregando comentarios...</p>
+          </div>
+          
+          <div class="comment-input-container">
+            <input type="text" class="comment-input" id="commentInput" 
+                   placeholder="Escreva um comentario...">
+            <button class="comment-submit" onclick="submitComment()">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
         </div>
-
-        <div class="flex items-center gap-4">
-            <button onclick="openPostModal()" class="btn-primary">POSTAR</button>
-            <div id="authArea" class="flex items-center gap-3 bg-white/5 border border-white/10 p-1.5 rounded-full cursor-pointer pr-4" onclick="openAuthModal()">
-                <img src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" id="userAvatar" class="w-8 h-8 rounded-full bg-slate-800">
-                <span id="userName" class="text-sm font-bold">ENTRAR</span>
-            </div>
-            <button id="logoutBtn" onclick="handleLogout()" class="hidden text-xs opacity-50 hover:opacity-100">SAIR</button>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-6">
-        <section id="trendingSection" class="mb-12 hidden">
-            <h2 class="text-xs font-black text-white/40 tracking-[0.2em] mb-6 border-l-4 border-[#8b5cf6] pl-4 uppercase">Em Destaque</h2>
-            <div id="trendingGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </section>
-
-        <section>
-            <h2 class="text-xs font-black text-white/40 tracking-[0.2em] mb-6 border-l-4 border-[#8b5cf6] pl-4 uppercase">Biblioteca Cloud</h2>
-            <div id="mainGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </section>
-    </main>
-
-    <!-- Game View Player -->
-    <div id="gamePage" class="game-page">
-        <div class="p-4 bg-slate-900 border-b border-white/10 flex justify-between items-center">
-            <h3 id="pgTitle" class="font-black text-[#8b5cf6] uppercase text-sm">Título</h3>
-            <div class="flex gap-3">
-                <button onclick="toggleFull()" class="px-4 py-2 bg-white/5 hover:bg-white/10 rounded font-bold text-xs">TELA CHEIA</button>
-                <button id="btnDelete" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded font-bold text-xs hidden">APAGAR</button>
-                <button onclick="closeGame()" class="px-4 py-2 bg-slate-800 rounded font-bold text-xs">FECHAR</button>
-            </div>
-        </div>
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
-            <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
-                <iframe id="gameIframe" class="w-full h-full border-none" allowfullscreen></iframe>
-            </div>
-            <div class="w-full max-w-5xl mt-8 bg-white/5 p-6 md:p-8 rounded-xl border border-white/10">
-                <div class="flex justify-between items-start">
-                    <h2 id="descTitle" class="text-2xl md:text-3xl font-black uppercase mb-4"></h2>
-                    <div id="likeBtn" class="flex items-center gap-2 cursor-pointer group">
-                        <i data-lucide="heart" id="heartIcon" class="w-8 h-8 transition-all"></i>
-                        <span id="likeCount" class="text-2xl font-black">0</span>
-                    </div>
-                </div>
-                <p id="descText" class="text-slate-400 leading-relaxed text-base md:text-lg"></p>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Modals -->
-    <div id="modalOverlay" class="modal-overlay" onclick="closeModals()"></div>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-[#111827] p-8 rounded-2xl border border-[#8b5cf6] w-full max-w-md hidden">
-        <h2 class="text-2xl font-black mb-6">SESSÃO SEGURA</h2>
-        <div class="space-y-4">
-            <input type="email" id="authEmail" placeholder="E-mail" class="w-full p-3 rounded-lg outline-none">
-            <input type="password" id="authPass" placeholder="Senha" class="w-full p-3 rounded-lg outline-none">
-            <input type="text" id="authNick" placeholder="Nickname (Para novos usuários)" class="w-full p-3 rounded-lg outline-none">
-            <div class="flex flex-col gap-2 pt-4">
-                <button onclick="handleAuth('login')" class="w-full bg-[#8b5cf6] py-3 rounded-lg font-bold">ENTRAR</button>
-                <button onclick="handleAuth('register')" class="w-full border border-[#8b5cf6] text-[#8b5cf6] py-3 rounded-lg font-bold">CRIAR CONTA</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Post Modal -->
-    <div id="postModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-[#111827] p-8 rounded-2xl border border-[#8b5cf6] w-full max-w-lg hidden overflow-y-auto max-h-[90vh]">
-        <h2 class="text-2xl font-black mb-6">PUBLICAR JOGO</h2>
-        <div class="space-y-4">
-            <input type="text" id="postTitle" placeholder="Nome do Jogo" class="w-full p-3 rounded-lg outline-none">
-            
-            <div class="p-4 bg-purple-900/20 rounded-xl border border-purple-500/30">
-                <p class="text-[10px] font-black text-purple-400 mb-2 tracking-widest uppercase">Gerador de Capa AI</p>
-                <textarea id="aiPrompt" placeholder="Descreva a arte (Ex: Um herói ninja estilo 8-bit)" class="w-full p-2 text-sm rounded mb-2 bg-black/40 outline-none"></textarea>
-                <button onclick="generateAIImg()" id="aiBtn" class="w-full bg-purple-600 text-xs py-2 rounded font-bold hover:bg-purple-500">GERAR CAPA PROFISSIONAL</button>
-                <img id="aiPreview" class="hidden w-full mt-3 rounded-lg border border-purple-500/50 aspect-video object-cover">
-            </div>
-
-            <input type="text" id="postUrl" placeholder="URL do Jogo (HTTPS)" class="w-full p-3 rounded-lg outline-none">
-            <textarea id="postDesc" placeholder="Descrição do projeto..." class="w-full p-3 rounded-lg h-24 outline-none"></textarea>
-            <button onclick="submitGame()" class="w-full btn-primary py-4">LANÇAR NA CLOUD</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // CONFIGURAÇÃO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAMHAKVot044psR421B_t-Ht5EmsueVS8A",
-            authDomain: "game-dev-space.firebaseapp.com",
-            projectId: "game-dev-space",
-            storageBucket: "game-dev-space.firebasestorage.app",
-            messagingSenderId: "1073185335190",
-            appId: "1:1073185335190:web:ae9ffd88cdf89f53cbdfb7"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const ADMIN_EMAIL = "contapropredro@gmail.com";
-
-        let userState = null;
-        let currentAiImg = "";
-
-        // --- AUTH SYSTEM ---
-        onAuthStateChanged(auth, (user) => {
-            userState = user;
-            if (user) {
-                document.getElementById('userName').innerText = user.displayName?.toUpperCase() || "PLAYER";
-                document.getElementById('userAvatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${user.uid}`;
-                document.getElementById('logoutBtn').classList.remove('hidden');
-            } else {
-                document.getElementById('userName').innerText = "ENTRAR";
-                document.getElementById('logoutBtn').classList.add('hidden');
-            }
-        });
-
-        window.handleAuth = async (type) => {
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPass').value;
-            const nick = document.getElementById('authNick').value;
-
-            if(!email || !pass) return alert("E-mail e senha são obrigatórios!");
-
-            try {
-                if (type === 'register') {
-                    if (!nick) return alert("Escolha um nickname!");
-                    const res = await createUserWithEmailAndPassword(auth, email, pass);
-                    await updateProfile(res.user, { displayName: nick });
-                } else {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                }
-                closeModals();
-            } catch (err) {
-                alert("Erro: " + err.message);
-            }
-        };
-
-        window.handleLogout = () => signOut(auth).then(() => location.reload());
-
-        // --- DATA SYSTEM ---
-        const loadGames = () => {
-            const q = query(collection(db, "games"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const games = [];
-                snapshot.forEach(doc => games.push({ id: doc.id, ...doc.data() }));
-                renderGrids(games);
-            });
-        };
-
-        const renderGrids = (games) => {
-            const mainGrid = document.getElementById('mainGrid');
-            const trendingGrid = document.getElementById('trendingGrid');
-            
-            mainGrid.innerHTML = games.map(g => `
-                <div class="game-card rounded-xl overflow-hidden cursor-pointer group" onclick="openGame('${g.id}')">
-                    <div class="relative aspect-video bg-slate-800">
-                        <img src="${g.pic}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
-                        <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] font-bold">
-                            ❤️ ${g.likes || 0}
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-black text-sm uppercase tracking-tight truncate">${g.title}</h4>
-                        <p class="text-[10px] text-white/40 mt-1 uppercase">Por ${g.authorName || 'Anônimo'}</p>
-                    </div>
-                </div>
-            `).join('');
-            
-            const trending = [...games].sort((a,b) => (b.likes || 0) - (a.likes || 0)).slice(0, 4);
-            if (trending.length > 0) {
-                document.getElementById('trendingSection').classList.remove('hidden');
-                trendingGrid.innerHTML = trending.map(g => `
-                    <div class="game-card rounded-xl overflow-hidden cursor-pointer group" onclick="openGame('${g.id}')">
-                        <div class="relative aspect-video bg-slate-800">
-                            <img src="${g.pic}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
-                        </div>
-                        <div class="p-4">
-                            <h4 class="font-black text-sm uppercase truncate">${g.title}</h4>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            lucide.createIcons();
-        };
-
-        window.openGame = async (id) => {
-            const docSnap = await getDoc(doc(db, "games", id));
-            const g = docSnap.data();
-            
-            document.getElementById('pgTitle').innerText = g.title;
-            document.getElementById('descTitle').innerText = g.title;
-            document.getElementById('descText').innerText = g.desc;
-            document.getElementById('gameIframe').src = g.url;
-            document.getElementById('likeCount').innerText = g.likes || 0;
-            
-            // Segurança: Somente autor ou admin apaga
-            const btnDel = document.getElementById('btnDelete');
-            if (userState && (userState.uid === g.authorId || userState.email === ADMIN_EMAIL)) {
-                btnDel.classList.remove('hidden');
-                btnDel.onclick = async () => {
-                    if(confirm("Deseja deletar este jogo permanentemente?")) {
-                        await deleteDoc(doc(db, "games", id));
-                        closeGame();
-                    }
-                };
-            } else {
-                btnDel.classList.add('hidden');
-            }
-
-            // Visual de Like
-            const heart = document.getElementById('heartIcon');
-            const isLiked = userState && g.likedBy?.includes(userState.uid);
-            heart.style.fill = isLiked ? '#ef4444' : 'transparent';
-            heart.style.stroke = isLiked ? '#ef4444' : 'white';
-
-            document.getElementById('likeBtn').onclick = async () => {
-                if (!userState) return alert("Faça login para curtir!");
-                if (isLiked) return;
-
-                await updateDoc(doc(db, "games", id), {
-                    likes: increment(1),
-                    likedBy: arrayUnion(userState.uid)
-                });
-            };
-
-            document.getElementById('gamePage').style.display = 'flex';
-        };
-
-        window.generateAIImg = async () => {
-            const prompt = document.getElementById('aiPrompt').value;
-            if (!prompt) return alert("Descreva a arte primeiro!");
-            
-            const btn = document.getElementById('aiBtn');
-            btn.innerText = "IA ESTÁ TRABALHANDO...";
-            btn.disabled = true;
-
-            const seed = Math.floor(Math.random() * 999999);
-            const url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1280&height=720&seed=${seed}&nologo=true`;
-            
-            const img = new Image();
-            img.src = url;
-            img.onload = () => {
-                currentAiImg = url;
-                document.getElementById('aiPreview').src = url;
-                document.getElementById('aiPreview').classList.remove('hidden');
-                btn.innerText = "GERAR NOVA ARTE";
-                btn.disabled = false;
-            };
-        };
-
-        window.submitGame = async () => {
-            if (!userState) return alert("Acesse sua conta para postar!");
-            const title = document.getElementById('postTitle').value;
-            const url = document.getElementById('postUrl').value;
-            const desc = document.getElementById('postDesc').value;
-
-            if (!title || !currentAiImg || !url) return alert("Preencha todos os campos e gere a capa!");
-
-            try {
-                await addDoc(collection(db, "games"), {
-                    title,
-                    url,
-                    desc,
-                    pic: currentAiImg,
-                    authorId: userState.uid,
-                    authorName: userState.displayName,
-                    likes: 0,
-                    likedBy: [],
-                    createdAt: new Date().getTime()
-                });
-                closeModals();
-                alert("Jogo publicado com sucesso!");
-            } catch (err) {
-                alert("Erro ao publicar: " + err.message);
-            }
-        };
-
-        // UI Handlers
-        window.openPostModal = () => {
-            if(!userState) return alert("Acesse sua conta para postar!");
-            document.getElementById('modalOverlay').style.display = 'block';
-            document.getElementById('postModal').style.display = 'block';
-        };
-
-        window.openAuthModal = () => {
-            document.getElementById('modalOverlay').style.display = 'block';
-            document.getElementById('authModal').style.display = 'block';
-        };
-
-        window.closeModals = () => {
-            document.querySelectorAll('.modal-overlay, #authModal, #postModal').forEach(el => el.style.display = 'none');
-        };
-
-        window.closeGame = () => {
-            document.getElementById('gamePage').style.display = 'none';
-            document.getElementById('gameIframe').src = '';
-        };
-
-        window.toggleFull = () => {
-            const i = document.getElementById('gameIframe');
-            if (i.requestFullscreen) i.requestFullscreen();
-        };
-
-        loadGames();
-    </script>
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
