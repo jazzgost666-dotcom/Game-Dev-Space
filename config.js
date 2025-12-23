@@ -8,31 +8,26 @@ const firebaseConfig = {
     appId: "1:1073185335190:web:ae9ffd88cdf89f53cbdfb7"
 };
 
-// Inicializa Firebase apenas se não houver outra instância
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
-const ADMIN = "contapropredro@gmail.com";
 
-// Função para sanitizar textos e evitar XSS
-function sanitize(str) {
-    const temp = document.createElement('div');
-    temp.textContent = str;
-    return temp.innerHTML;
-}
-
-// Scanner de "IA" simples para arquivos maliciosos
-async function scanForMalware(content) {
-    const forbidden = [
+// "IA" de checagem de Malware (Filtro Heurístico)
+async function scanFileSecurity(fileContent) {
+    const dangerousPatterns = [
         /document\.cookie/gi, 
         /localStorage\.clear/gi, 
+        /sessionStorage/gi,
         /parent\.location/gi, 
+        /top\.location/gi,
         /<script.*src.*http/gi,
-        /eval\(/gi
+        /eval\(/gi,
+        /window\.open/gi
     ];
-    for (let pattern of forbidden) {
-        if (pattern.test(content)) return false;
+    
+    for (let pattern of dangerousPatterns) {
+        if (pattern.test(fileContent)) return false;
     }
     return true;
 }
