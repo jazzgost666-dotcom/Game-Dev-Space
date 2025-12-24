@@ -104,7 +104,7 @@
                     <button onclick="closeViewer()" class="bg-red-600 px-6 py-2 rounded-lg font-bold text-xs">SAIR DO JOGO</button>
                     <button onclick="document.getElementById('main-frame').requestFullscreen()" class="bg-purple-600 px-6 py-2 rounded-lg font-bold text-xs">TELA CHEIA</button>
                 </div>
-                <iframe id="main-frame" class="flex-1 w-full border-none bg-white" sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen></iframe>
+                <iframe id="main-frame" class="flex-1 w-full border-none bg-black" sandbox="allow-scripts allow-same-origin allow-forms" allowfullscreen></iframe>
             </div>
             
             <div class="w-full lg:w-[380px] glass p-6 flex flex-col border-l border-white/10">
@@ -254,7 +254,9 @@
                 localStorage.setItem('gs_interact', JSON.stringify(interactions));
             }
             
-            // ESCUTA O JOGO EM TEMPO REAL (REALTIME UPDATE)
+            let gameLoaded = false; 
+
+            // ESCUTA O JOGO EM TEMPO REAL
             gameListener = onValue(ref(window.fbDB, `games/${id}`), snap => {
                 const g = snap.val(); if(!g) return;
                 document.getElementById('v-title').innerText = g.name;
@@ -262,11 +264,24 @@
                 document.getElementById('v-views').innerText = g.views;
                 document.getElementById('v-likes').innerText = g.likes;
                 
-                // Só carrega o frame na primeira vez
-                const frame = document.getElementById('main-frame');
-                if(!frame.src && !frame.srcdoc) {
-                    if(g.type === 'url' || g.type === 'file') frame.src = g.content;
-                    else frame.srcdoc = g.content;
+                // --- CORREÇÃO DA TELA BRANCA ---
+                if (!gameLoaded) {
+                    const frame = document.getElementById('main-frame');
+                    
+                    // Reset total do frame antes de carregar
+                    frame.src = "about:blank";
+                    frame.removeAttribute('srcdoc');
+
+                    // Delay de 50ms para o browser processar a limpeza
+                    setTimeout(() => {
+                        if(g.type === 'url' || g.type === 'file') {
+                            frame.src = g.content;
+                        } else {
+                            frame.srcdoc = g.content;
+                        }
+                    }, 50);
+
+                    gameLoaded = true; 
                 }
             });
 
@@ -282,11 +297,18 @@
         }
 
         function closeViewer() {
-            if(gameListener) window.fbLib.off(window.fbLib.ref(window.fbDB, `games/${activeId}`));
-            document.getElementById('main-frame').src = "";
-            document.getElementById('main-frame').srcdoc = "";
+            if(gameListener && activeId) {
+                window.fbLib.off(window.fbLib.ref(window.fbDB, `games/${activeId}`));
+            }
+            
+            const frame = document.getElementById('main-frame');
+            // Limpeza agressiva para não bugar a segunda vez
+            frame.src = "about:blank";
+            frame.removeAttribute('srcdoc');
+            
             document.getElementById('game-viewer').style.display = 'none';
             activeId = null;
+            gameListener = null;
         }
 
         function postComment() {
