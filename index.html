@@ -5,111 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feliz Natal - Voltamos Logo!</title>
     <style>
-        /* Configurações Gerais */
         body {
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: radial-gradient(circle, #1a472a, #0d2b19); /* Verde Pinheiro */
+            min-height: 100vh;
+            background: radial-gradient(circle, #1a472a, #0d2b19);
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
             text-align: center;
         }
 
         /* Container Principal */
-        .container {
-            z-index: 2;
-            padding: 20px;
+        .content {
+            z-index: 10;
+            pointer-events: none; /* Deixa o mouse passar para o jogo abaixo */
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 2rem; color: #ff4d4d; text-shadow: 2px 2px #000; margin: 0; }
+        p { font-size: 1rem; margin: 5px 0; }
+
+        /* Área do Jogo */
+        #game-container {
+            position: relative;
+            width: 90vw;
+            max-width: 400px;
+            height: 300px;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 2px solid #c41e3a; /* Vermelho Natalino */
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            max-width: 500px;
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: crosshair;
+            pointer-events: all;
+            touch-action: none;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #ff4d4d;
-            text-shadow: 2px 2px #000;
-        }
-
-        p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-        }
-
-        .icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-
-        /* Efeito de Neve */
-        .snow-container {
+        #basket {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            transition: left 0.1s ease-out;
         }
 
+        .item {
+            position: absolute;
+            font-size: 30px;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        /* Neve de fundo */
         .snowflake {
             position: absolute;
             top: -10px;
             color: white;
-            font-size: 1em;
-            user-select: none;
             animation: fall linear infinite;
+            z-index: 1;
         }
 
-        @keyframes fall {
-            to {
-                transform: translateY(105vh);
-            }
-        }
-
-        /* Rodapé/Data */
-        .back-soon {
-            margin-top: 20px;
-            font-weight: bold;
-            color: #ffd700; /* Dourado */
-        }
+        @keyframes fall { to { transform: translateY(105vh); } }
     </style>
 </head>
 <body>
 
-    <div class="snow-container" id="snow"></div>
-
-    <div class="container">
-        <div class="icon">🎄</div>
+    <div class="content">
         <h1>Ho-Ho-Ho!</h1>
-        <p>Estamos preparando alguns presentes especiais para você. <br> O site está em manutenção natalina!</p>
-        <div class="back-soon">Voltaremos em breve com novidades.</div>
+        <p>Estamos em manutenção natalina.</p>
+        <p>Aproveite para ajudar o Papai Noel enquanto espera:</p>
+    </div>
+
+    <div id="game-container">
+        <div id="score">Presentes: 0</div>
+        <div id="basket">🛷</div>
     </div>
 
     <script>
-        // Script simples para gerar flocos de neve aleatórios
-        const snowContainer = document.getElementById('snow');
-        const snowflakeCount = 50;
-
-        for (let i = 0; i < snowflakeCount; i++) {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
-            snowflake.innerHTML = '❄';
-            snowflake.style.left = Math.random() * 100 + 'vw';
-            snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's'; // Entre 2 e 5 segundos
-            snowflake.style.opacity = Math.random();
-            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-            
-            snowContainer.appendChild(snowflake);
+        // --- Sistema de Neve ---
+        for (let i = 0; i < 30; i++) {
+            let flake = document.createElement('div');
+            flake.className = 'snowflake';
+            flake.innerHTML = '❄';
+            flake.style.left = Math.random() * 100 + 'vw';
+            flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            flake.style.opacity = Math.random();
+            document.body.appendChild(flake);
         }
+
+        // --- Mini Jogo ---
+        const container = document.getElementById('game-container');
+        const basket = document.getElementById('basket');
+        const scoreElement = document.getElementById('score');
+        let score = 0;
+
+        // Movimentação (Mouse e Touch)
+        const moveBasket = (e) => {
+            let rect = container.getBoundingClientRect();
+            let x = (e.clientX || e.touches[0].clientX) - rect.left;
+            let pos = Math.max(20, Math.min(x, rect.width - 20));
+            basket.style.left = pos + 'px';
+        };
+
+        container.addEventListener('mousemove', moveBasket);
+        container.addEventListener('touchmove', moveBasket);
+
+        // Criar Presentes
+        function createGift() {
+            const gift = document.createElement('div');
+            gift.className = 'item';
+            const icons = ['🎁', '🍬', '⭐', '🍪'];
+            gift.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            gift.style.left = Math.random() * (container.offsetWidth - 30) + 'px';
+            gift.style.top = '-40px';
+            container.appendChild(gift);
+
+            let fallInterval = setInterval(() => {
+                let top = parseInt(gift.style.top);
+                if (top > container.offsetHeight) {
+                    clearInterval(fallInterval);
+                    gift.remove();
+                } else {
+                    gift.style.top = (top + 4) + 'px';
+                    
+                    // Detecção de colisão simples
+                    let bRect = basket.getBoundingClientRect();
+                    let gRect = gift.getBoundingClientRect();
+
+                    if (gRect.bottom > bRect.top && gRect.left < bRect.right && gRect.right > bRect.left) {
+                        score++;
+                        scoreElement.innerHTML = `Presentes: ${score}`;
+                        clearInterval(fallInterval);
+                        gift.remove();
+                    }
+                }
+            }, 20);
+        }
+
+        setInterval(createGift, 1000);
     </script>
 </body>
 </html>
