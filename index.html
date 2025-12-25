@@ -3,157 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feliz Natal - Voltamos Logo!</title>
+    <title>Oficina do Noel - Manutenção</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --red: #d42426;
+            --green: #165b33;
+            --gold: #f8b229;
+            --white: #f8f9fa;
+        }
+
         body {
             margin: 0;
             padding: 0;
+            background: #0a1f14;
+            color: var(--white);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2 {
+            font-family: 'Mountains of Christmas', cursive;
+            margin: 0;
+            color: var(--red);
+            text-shadow: 2px 2px 0px var(--white);
+        }
+
+        .header { text-align: center; z-index: 10; margin-bottom: 20px; }
+        .header h1 { font-size: 3.5rem; }
+
+        /* Game Console Container */
+        .game-machine {
+            background: var(--green);
+            padding: 20px;
+            border-radius: 30px;
+            border: 8px solid var(--red);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+            width: 90vw;
+            max-width: 500px;
+        }
+
+        .screen {
+            background: #e0f4ff;
+            border-radius: 15px;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #000;
+        }
+
+        /* Menu de Jogos */
+        .menu {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: radial-gradient(circle, #1a472a, #0d2b19);
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
-            text-align: center;
+            height: 100%;
+            gap: 15px;
         }
 
-        /* Container Principal */
-        .content {
-            z-index: 10;
-            pointer-events: none; /* Deixa o mouse passar para o jogo abaixo */
-            margin-bottom: 20px;
+        .btn-game {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-family: 'Mountains of Christmas', cursive;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 0 #8b1a1a;
         }
 
-        h1 { font-size: 2rem; color: #ff4d4d; text-shadow: 2px 2px #000; margin: 0; }
-        p { font-size: 1rem; margin: 5px 0; }
+        .btn-game:hover { transform: scale(1.1); background: #ff3e3e; }
+        .btn-game:active { transform: translateY(4px); box-shadow: none; }
 
-        /* Área do Jogo */
-        #game-container {
-            position: relative;
-            width: 90vw;
-            max-width: 400px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #ffd700;
-            border-radius: 15px;
-            overflow: hidden;
-            cursor: crosshair;
-            pointer-events: all;
-            touch-action: none;
-        }
-
-        #basket {
+        /* Elementos do Jogo */
+        #player {
             position: absolute;
             bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 40px;
+            width: 60px;
+            height: 40px;
             transition: left 0.1s ease-out;
+            z-index: 5;
         }
 
-        .item {
+        .falling-item {
             position: absolute;
-            font-size: 30px;
+            width: 35px;
+            height: 35px;
         }
 
-        #score {
+        .score-board {
             position: absolute;
             top: 10px;
             left: 10px;
+            color: var(--green);
             font-weight: bold;
-            color: #ffd700;
+            font-size: 1.2rem;
+            z-index: 6;
         }
 
-        /* Neve de fundo */
-        .snowflake {
+        .back-btn {
             position: absolute;
-            top: -10px;
+            top: 10px;
+            right: 10px;
+            background: var(--red);
+            border: none;
             color: white;
-            animation: fall linear infinite;
-            z-index: 1;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            z-index: 6;
         }
 
-        @keyframes fall { to { transform: translateY(105vh); } }
+        /* Neve de Fundo */
+        .snow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
     </style>
 </head>
 <body>
 
-    <div class="content">
-        <h1>Ho-Ho-Ho!</h1>
-        <p>Estamos em manutenção natalina.</p>
-        <p>Aproveite para ajudar o Papai Noel enquanto espera:</p>
+    <canvas class="snow" id="snowCanvas"></canvas>
+
+    <div class="header">
+        <h1>Oficina em Manutenção</h1>
+        <p>Os elfos estão polindo o site! Jogue um pouco:</p>
     </div>
 
-    <div id="game-container">
-        <div id="score">Presentes: 0</div>
-        <div id="basket">🛷</div>
+    <div class="game-machine">
+        <div class="screen" id="screen">
+            <div class="menu" id="mainMenu">
+                <h2 style="color: var(--green); text-shadow: none; margin-bottom: 10px;">Biblioteca de Natal</h2>
+                <button class="btn-game" onclick="startGame('collect')">Pegar Presentes</button>
+                <button class="btn-game" onclick="startGame('dodge')">Desviar do Carvão</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- Sistema de Neve ---
-        for (let i = 0; i < 30; i++) {
-            let flake = document.createElement('div');
-            flake.className = 'snowflake';
-            flake.innerHTML = '❄';
-            flake.style.left = Math.random() * 100 + 'vw';
-            flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            flake.style.opacity = Math.random();
-            document.body.appendChild(flake);
+        const screen = document.getElementById('screen');
+        const mainMenu = document.getElementById('mainMenu');
+        let gameActive = false;
+        let score = 0;
+        let gameType = '';
+
+        // SVGs Curtunescos
+        const svgSleigh = `<svg viewBox="0 0 512 512" fill="#d42426"><path d="M496 384c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zm-48 32c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zM16 352h400c8.8 0 16-7.2 16-16s-7.2-16-16-16H278.1c-14.7-29.3-44.8-48-78.1-48s-63.4 18.7-78.1 48H16c-8.8 0-16 7.2-16 16s7.2 16 16 16z"/></svg>`;
+        const svgGift = `<svg viewBox="0 0 512 512" fill="#165b33"><rect x="128" y="128" width="256" height="256" rx="20"/><path d="M256 128v256M128 256h256" stroke="#f8b229" stroke-width="20"/><path d="M256 128s-40-64-80-64-40 64 0 64M256 128s40-64 80-64 40 64 0 64" fill="none" stroke="#d42426" stroke-width="20"/></svg>`;
+        const svgCoal = `<svg viewBox="0 0 512 512" fill="#333"><path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 384c-97 0-176-79-176-176s79-176 176-176 176 79 176 176-79 176-176 176z"/></svg>`;
+
+        function startGame(type) {
+            gameType = type;
+            gameActive = true;
+            score = 0;
+            mainMenu.style.display = 'none';
+            
+            // Setup Arena
+            screen.innerHTML = `
+                <button class="back-btn" onclick="resetMenu()">X</button>
+                <div class="score-board">Pontos: 0</div>
+                <div id="player">${svgSleigh}</div>
+            `;
+            
+            const player = document.getElementById('player');
+            const scoreBoard = screen.querySelector('.score-board');
+
+            // Movimento
+            screen.onmousemove = (e) => {
+                let rect = screen.getBoundingClientRect();
+                let x = e.clientX - rect.left - 30;
+                player.style.left = Math.max(0, Math.min(x, rect.width - 60)) + 'px';
+            };
+
+            // Loop de Criação
+            const gameLoop = setInterval(() => {
+                if(!gameActive) { clearInterval(gameLoop); return; }
+                createFallingItem(type, player, scoreBoard);
+            }, type === 'collect' ? 800 : 500);
         }
 
-        // --- Mini Jogo ---
-        const container = document.getElementById('game-container');
-        const basket = document.getElementById('basket');
-        const scoreElement = document.getElementById('score');
-        let score = 0;
+        function createFallingItem(type, player, scoreBoard) {
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+            const isBad = type === 'dodge' || (type === 'collect' && Math.random() > 0.8);
+            
+            item.innerHTML = (type === 'dodge') ? svgCoal : svgGift;
+            item.style.left = Math.random() * (screen.offsetWidth - 40) + 'px';
+            item.style.top = '-40px';
+            screen.appendChild(item);
 
-        // Movimentação (Mouse e Touch)
-        const moveBasket = (e) => {
-            let rect = container.getBoundingClientRect();
-            let x = (e.clientX || e.touches[0].clientX) - rect.left;
-            let pos = Math.max(20, Math.min(x, rect.width - 20));
-            basket.style.left = pos + 'px';
-        };
+            let speed = 3 + Math.random() * 3;
+            let fall = setInterval(() => {
+                if(!gameActive) { clearInterval(fall); item.remove(); return; }
+                
+                let top = parseFloat(item.style.top);
+                item.style.top = (top + speed) + 'px';
 
-        container.addEventListener('mousemove', moveBasket);
-        container.addEventListener('touchmove', moveBasket);
+                // Colisão
+                let pRect = player.getBoundingClientRect();
+                let iRect = item.getBoundingClientRect();
 
-        // Criar Presentes
-        function createGift() {
-            const gift = document.createElement('div');
-            gift.className = 'item';
-            const icons = ['🎁', '🍬', '⭐', '🍪'];
-            gift.innerHTML = icons[Math.floor(Math.random() * icons.length)];
-            gift.style.left = Math.random() * (container.offsetWidth - 30) + 'px';
-            gift.style.top = '-40px';
-            container.appendChild(gift);
-
-            let fallInterval = setInterval(() => {
-                let top = parseInt(gift.style.top);
-                if (top > container.offsetHeight) {
-                    clearInterval(fallInterval);
-                    gift.remove();
-                } else {
-                    gift.style.top = (top + 4) + 'px';
-                    
-                    // Detecção de colisão simples
-                    let bRect = basket.getBoundingClientRect();
-                    let gRect = gift.getBoundingClientRect();
-
-                    if (gRect.bottom > bRect.top && gRect.left < bRect.right && gRect.right > bRect.left) {
+                if(iRect.bottom > pRect.top && iRect.left < pRect.right && iRect.right > pRect.left) {
+                    if(type === 'collect') {
                         score++;
-                        scoreElement.innerHTML = `Presentes: ${score}`;
-                        clearInterval(fallInterval);
-                        gift.remove();
+                        scoreBoard.innerText = `Pontos: ${score}`;
+                    } else {
+                        gameOver();
                     }
+                    clearInterval(fall);
+                    item.remove();
+                }
+
+                if(top > 400) {
+                    if(type === 'dodge') { score++; scoreBoard.innerText = `Desvios: ${score}`; }
+                    clearInterval(fall);
+                    item.remove();
                 }
             }, 20);
         }
 
-        setInterval(createGift, 1000);
+        function gameOver() {
+            gameActive = false;
+            alert(`Fim de Jogo! Você fez ${score} pontos.`);
+            resetMenu();
+        }
+
+        function resetMenu() {
+            gameActive = false;
+            screen.innerHTML = '';
+            screen.appendChild(mainMenu);
+            mainMenu.style.display = 'flex';
+        }
+
+        // Neve
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.onresize = resize;
+        resize();
+
+        for(let i=0; i<100; i++) particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*3+1, d: Math.random()+0.5});
+
+        function drawSnow() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            particles.forEach(p => {
+                ctx.moveTo(p.x, p.y);
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                p.y += p.d;
+                if(p.y > canvas.height) p.y = -10;
+            });
+            ctx.fill();
+            requestAnimationFrame(drawSnow);
+        }
+        drawSnow();
     </script>
 </body>
 </html>
