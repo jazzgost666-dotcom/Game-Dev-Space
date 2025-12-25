@@ -1,1 +1,243 @@
-1
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamedevspace | Natal Edition 🎄</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary: #ff2e40; --secondary: #00ff9c; --bg-dark: #020205;
+            --bg-card: rgba(20, 20, 25, 0.8); --border: rgba(255, 255, 255, 0.1);
+            --radius: 12px; --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body { 
+            margin: 0; font-family: 'Outfit', sans-serif; background: var(--bg-dark); color: #fff; 
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 5%; height: 70px; border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-actions { display: flex; gap: 15px; align-items: center; }
+        .user-pill { display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--glass); padding: 5px 15px; border-radius: 99px; border: 1px solid var(--border); }
+        .avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--primary); }
+
+        /* GRID */
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 30px 5%; }
+        .game-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
+        .game-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .card-img { width: 100%; height: 150px; object-fit: cover; }
+        .card-body { padding: 12px; }
+
+        /* PLAYER COM ABA DE COMENTÁRIOS LATERAL */
+        .game-view { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; flex-direction: column; }
+        .player-header { height: 50px; background: #111; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
+        
+        .player-container { display: flex; flex: 1; overflow: hidden; }
+        iframe { flex: 1; border: none; background: #000; }
+
+        .side-chat { 
+            width: 350px; background: #0a0a0a; border-left: 1px solid var(--border); 
+            display: flex; flex-direction: column; 
+        }
+        .chat-header { padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--primary); }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { background: var(--glass); padding: 10px; border-radius: 8px; font-size: 0.9rem; border-left: 3px solid var(--primary); }
+        .chat-input-area { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+
+        /* MODAIS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 3000; padding: 20px; }
+        .modal-content { background: #111; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid var(--border); }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 8px; }
+        .btn { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+
+        .banner-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--primary); border: none; color: #fff; padding: 5px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight: 900; font-size: 1.4rem;">GDS<span>.Cloud</span> 🎄</div>
+    <div class="nav-actions">
+        <button onclick="openModal('postModal')" style="background:none; border:1px solid var(--primary); color:#fff; padding:5px 15px; border-radius:20px; cursor:pointer;">+ Postar</button>
+        <div class="user-pill" onclick="openModal('profileModal')">
+            <img id="navAv" class="avatar" src="https://ui-avatars.com/api/?name=?">
+            <span id="navName">Entrar</span>
+        </div>
+    </div>
+</header>
+
+<div class="main-grid" id="grid"></div>
+
+<div class="modal" id="postModal" onclick="if(event.target==this) this.style.display='none'">
+    <div class="modal-content">
+        <h3>Novo Jogo</h3>
+        <input id="gTitle" placeholder="Título">
+        <input id="gUrl" placeholder="URL do Jogo (Embed)">
+        <input id="gImg" placeholder="URL da Capa (GIF ou Foto)">
+        <select id="gCat">
+            <option>Ação</option><option>Natal 🎄</option><option>Aventura</option><option>Terror</option><option>RPG</option>
+        </select>
+        <button class="btn" onclick="saveGame()">Publicar na Biblioteca</button>
+    </div>
+</div>
+
+<div class="modal" id="profileModal" onclick="if(event.target==this) this.style.display='none'">
+    <div class="modal-content">
+        <div id="authBox">
+            <h3>Entrar</h3>
+            <input id="nick" placeholder="Seu Nick">
+            <button class="btn" onclick="login()">Entrar</button>
+        </div>
+        <div id="userBox" style="display:none">
+            <img id="pBanner" class="banner-preview" src="">
+            <h3 id="pNick">Nick</h3>
+            <input id="pAvUrl" placeholder="Link do Avatar (GIF)">
+            <input id="pBanUrl" placeholder="Link do Banner (GIF)">
+            <button class="btn" onclick="saveProfile()">Salvar Perfil</button>
+            <button onclick="logout()" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer">Sair</button>
+        </div>
+    </div>
+</div>
+
+<div class="game-view" id="gameView">
+    <div class="player-header">
+        <button onclick="closeGame()" style="background:none; border:none; color:#fff; cursor:pointer;"><i data-lucide="arrow-left"></i> Voltar</button>
+        <b id="vTitle">Jogo</b>
+        <button onclick="toggleFS()" style="background:none; border:none; color:#fff; cursor:pointer;"><i data-lucide="maximize"></i></button>
+    </div>
+    <div class="player-container">
+        <iframe id="vFrame" allowfullscreen></iframe>
+        <div class="side-chat">
+            <div class="chat-header">Comentários</div>
+            <div class="chat-messages" id="vComments"></div>
+            <div class="chat-input-area">
+                <input id="vInput" placeholder="Digite algo..." style="margin:0">
+                <button onclick="sendComment()" style="background:var(--primary); border:none; border-radius:8px; padding:0 10px; cursor:pointer"><i data-lucide="send" color="#fff"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// CONFIG
+const firebaseConfig = { apiKey: "SUA_API_KEY", authDomain: "gamehub-b8338.firebaseapp.com", projectId: "gamehub-b8338" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let user = JSON.parse(localStorage.getItem("gds_user"));
+let currentId = null;
+
+window.onload = () => { lucide.createIcons(); loadGames(); updateUI(); };
+
+function openModal(id) { document.getElementById(id).style.display = 'grid'; }
+
+function login() {
+    const n = nick.value.trim();
+    if(!n) return;
+    db.collection("users").doc(n).get().then(doc => {
+        user = doc.exists ? doc.data() : { nick: n, avatar: "", banner: "" };
+        localStorage.setItem("gds_user", JSON.stringify(user));
+        location.reload();
+    });
+}
+
+function saveProfile() {
+    user.avatar = pAvUrl.value;
+    user.banner = pBanUrl.value;
+    db.collection("users").doc(user.nick).set(user).then(() => {
+        localStorage.setItem("gds_user", JSON.stringify(user));
+        updateUI();
+        alert("Perfil salvo!");
+    });
+}
+
+function updateUI() {
+    if(user) {
+        navName.innerText = user.nick;
+        navAv.src = user.avatar || "https://ui-avatars.com/api/?name="+user.nick;
+        authBox.style.display = 'none';
+        userBox.style.display = 'block';
+        pNick.innerText = user.nick;
+        pAvUrl.value = user.avatar;
+        pBanUrl.value = user.banner;
+        pBanner.src = user.banner;
+    }
+}
+
+function logout() { localStorage.removeItem("gds_user"); location.reload(); }
+
+// BIBLIOTECA
+function saveGame() {
+    if(!user) return alert("Logue para postar!");
+    db.collection("games").add({
+        title: gTitle.value, url: gUrl.value, img: gImg.value, cat: gCat.value, 
+        author: user.nick, createdAt: Date.now()
+    }).then(() => location.reload());
+}
+
+function loadGames() {
+    db.collection("games").orderBy("createdAt", "desc").onSnapshot(snap => {
+        grid.innerHTML = "";
+        snap.forEach(doc => {
+            const g = doc.data();
+            grid.innerHTML += `
+                <div class="game-card" onclick="openGame('${doc.id}', '${g.url}', '${g.title}')">
+                    ${user?.nick === g.author ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteGame('${doc.id}')">🗑️</button>` : ''}
+                    <img class="card-img" src="${g.img}">
+                    <div class="card-body"><b>${g.title}</b><br><small>${g.cat}</small></div>
+                </div>`;
+        });
+    });
+}
+
+function deleteGame(id) { if(confirm("Apagar jogo?")) db.collection("games").doc(id).delete(); }
+
+// PLAYER E CHAT LATERAL
+function openGame(id, url, title) {
+    currentId = id;
+    gameView.style.display = 'flex';
+    vFrame.src = url;
+    vTitle.innerText = title;
+    loadComments(id);
+}
+
+function closeGame() { gameView.style.display = 'none'; vFrame.src = ""; }
+
+function toggleFS() { 
+    if(!document.fullscreenElement) vFrame.requestFullscreen(); 
+    else document.exitFullscreen(); 
+}
+
+function sendComment() {
+    if(!user) return alert("Logue para comentar!");
+    if(!vInput.value.trim()) return;
+    db.collection("games").doc(currentId).collection("comments").add({
+        u: user.nick, t: vInput.value, d: Date.now()
+    });
+    vInput.value = "";
+}
+
+function loadComments(id) {
+    db.collection("games").doc(id).collection("comments").orderBy("d", "asc").onSnapshot(snap => {
+        vComments.innerHTML = "";
+        snap.forEach(doc => {
+            const c = doc.data();
+            vComments.innerHTML += `<div class="msg"><b>${c.u}:</b> ${c.t}</div>`;
+        });
+        vComments.scrollTop = vComments.scrollHeight;
+    });
+}
+</script>
+</body>
+</html>
